@@ -45,6 +45,12 @@ Quick start: `docs/quick-start.md`
 - 2026-02-19: Two estimations completed (one per architecture option)
 - 2026-02-19: Azure environments confirmed — exist and available (reduced setup hours)
 - 2026-02-19: Management leaning Blazor — awaiting final sign-off
+- 2026-02-19: "Masquerade" renamed to "Act-on-Behalf" — clearer for non-technical stakeholders
+- 2026-02-19: Act-on-Behalf + Split Allocations moved from Post-MVP to MVP (client-requested features)
+- 2026-02-19: Grid library options documented — MudBlazor (MIT, free) recommended; Telerik/AG Grid as paid fallback
+- 2026-02-19: All estimation items now labeled "Client-requested" vs "Suggested enhancement"
+- 2026-02-19: Prototype data theme corrected — energy commodities → server components (RAM, CPUs, NVMe, NICs)
+- 2026-02-19: Wrong transcript contamination cleaned from all docs (analytics workstream references removed)
 
 ### Pending Decisions
 
@@ -64,6 +70,10 @@ Quick start: `docs/quick-start.md`
 **2. Auth approach: Azure AD Groups vs Internal DB Roles**
 - Option A (recommended): Use Azure AD Groups for role management — no user/role tables in app DB, role changes happen in Azure AD
 - Option B: Internal DB Users + UserRoles tables with admin UI — +24 hrs, independent of Azure AD group config
+
+**3. Grid library: MudBlazor free vs paid alternative (evaluate Sprint 0)**
+- Start with MudBlazor DataGrid (MIT, $0) — evaluate if in-cell editing meets requirements
+- Fallback: Telerik (~$1K/dev/yr) or AG Grid Blazor (~$1.1K/dev one-time)
 
 ### Key Context
 - **Team:** 2 Fullstack .NET Developers (possible 3rd), new hires — skill levels TBD
@@ -98,12 +108,16 @@ Quick start: `docs/quick-start.md`
 Internal web app replacing spreadsheet/email-based bidding workflows:
 - Bid & Offer Management (create, track, in-cell editing)
 - Inventory Handling (bulk upload CSV/Excel, state tracking, grouping)
-- Allocation & Approval Workflow (aggregated view, configurable thresholds, escalation)
-- Customer Management (CRUD, assignment, masquerade with audit)
+- Allocation & Approval Workflow (aggregated view, configurable thresholds, split allocations)
+- Act-on-Behalf (sales reps enter bids for customers with full attribution + audit)
+- Customer Management (CRUD, assignment to reps)
 - Role-based Access (Sales Rep, Sales Manager, Admin, Finance read-only, Executive read-only)
 - Audit Trail (immutable logging for all tracked actions)
 - Order-ready Exports (CSV/PDF after approval)
 - Data Foundation (normalized SQL for future analytics consumption)
+
+### Grid Library (Core UI Decision)
+In-cell editing grid = where sales reps enter bids in a table like Excel. Recommended: **MudBlazor DataGrid (MIT license, free)**. Evaluate in Sprint 0 — if insufficient, upgrade to Telerik (~$1K/dev/yr) or AG Grid Blazor (~$1.1K/dev). Do NOT build manually with jQuery — conflicts with Blazor DOM management. Full options in estimation docs.
 
 ### Out of Scope (Phase 1)
 - Analytics dashboards (future consideration)
