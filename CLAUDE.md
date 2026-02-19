@@ -31,11 +31,11 @@ Quick start: `docs/quick-start.md`
 
 ## Current Project State
 
-**Status:** Active — Pre-Execution (pending architecture decision)
+**Status:** Active — Pre-Execution (Blazor leaning, awaiting final sign-off)
 **Project Name:** EMPA-ReMarkets
 **Client:** REMarkets
 **Consulting Firm:** Simpat
-**Current Phase:** Between Estimate and Execute — waiting on Blazor vs React decision
+**Current Phase:** Between Estimate and Execute — management leaning toward Blazor + .NET 10
 **Last Updated:** 2026-02-19
 
 ### Decisions Made
@@ -43,28 +43,34 @@ Quick start: `docs/quick-start.md`
 - 2026-02-19: Two architecture options generated (React + .NET 10 vs Blazor + .NET 10)
 - 2026-02-19: Prototype delivered — 6 screens (Login, Dashboard, Offers, Inventory, Allocations, Customers)
 - 2026-02-19: Two estimations completed (one per architecture option)
+- 2026-02-19: Azure environments confirmed — exist and available (reduced setup hours)
+- 2026-02-19: Management leaning Blazor — awaiting final sign-off
 
-### Pending Decision: Blazor vs React
+### Pending Decisions
+
+**1. Blazor vs React (leaning Blazor)**
 
 | Metric | React + .NET 10 | Blazor + .NET 10 |
 |--------|-----------------|-------------------|
-| Total Hours | ~1,130 hrs | ~970 hrs |
-| MVP Timeline (2 devs) | ~11 weeks | ~9.5 weeks |
-| MVP Timeline (3 devs) | ~7.5 weeks | ~6 weeks |
+| Total Hours (Auth Option A) | ~1,144 hrs | ~980 hrs |
+| MVP Timeline (2 devs) | ~13 weeks | ~11 weeks |
+| MVP Timeline (3 devs) | ~8.5 weeks | ~7 weeks |
 | Learning Curve | ~100 hrs | ~56 hrs |
 | In-cell editing (core feature) | ⭐⭐⭐⭐⭐ AG Grid | ⭐⭐⭐⭐ MudBlazor |
 | Future customer portal | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ |
 | Hiring future devs | ⭐⭐⭐⭐⭐ | ⭐⭐ |
 | CI/CD complexity | Medium (2 deploys) | Low (1 deploy) |
 
-**Bottom line:** Blazor saves ~160 hrs and ~2 weeks. React costs more upfront but has better grid editing, hiring pool, and future portal path.
+**2. Auth approach: Azure AD Groups vs Internal DB Roles**
+- Option A (recommended): Use Azure AD Groups for role management — no user/role tables in app DB, role changes happen in Azure AD
+- Option B: Internal DB Users + UserRoles tables with admin UI — +24 hrs, independent of Azure AD group config
 
 ### Key Context
 - **Team:** 2 Fullstack .NET Developers (possible 3rd), new hires — skill levels TBD
 - **Existing Dev:** Part-time support/advisor, familiar with Simpat/REMarkets systems
-- **Stack:** .NET 10 + Azure SQL + Microsoft Entra (frontend framework TBD)
-- **Environments:** Dev, Test, Prod (TBD if Azure infra already exists)
-- **CI/CD:** TBD — depends on architecture decision
+- **Stack:** .NET 10 + Azure SQL + Microsoft Entra (Blazor leaning)
+- **Environments:** Dev, Test, Prod — **confirmed existing**, plug into client's Azure infra
+- **CI/CD:** Single deploy pipeline (if Blazor confirmed)
 - **QA:** No dedicated QA — Sales Team and Product Owners handle UAT
 - **No Designer:** UI/UX is Simpat's responsibility (prototype serves as design reference)
 - **Technical Leadership:** REMarkets wants Simpat to lead all technical decisions
@@ -78,11 +84,12 @@ Quick start: `docs/quick-start.md`
 - **Finance/Compliance:** Chelsie White, Avery Wolfe, Sara Ruiz
 
 ### TBDs That Impact Estimation
-- Azure environments — already provisioned or need setup?
-- Dev team React/Blazor experience levels
+- ~~Azure environments — already provisioned or need setup?~~ **CONFIRMED: exist**
+- Auth approach — Azure AD Groups (recommended) vs Internal DB Roles?
+- Dev team Blazor experience levels
 - 3rd developer available?
-- AG Grid Community vs Enterprise (if React chosen)
-- IaC required (Bicep)?
+- MudBlazor DataGrid sufficient for in-cell editing? (evaluate Sprint 0)
+- Automated infrastructure setup required (Azure Bicep)?
 
 ---
 
