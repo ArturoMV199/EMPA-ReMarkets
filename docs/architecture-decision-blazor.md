@@ -3,7 +3,7 @@
 
 ## Project Context
 
-Internal web application for REMarkets to manage sales-side bidding, offer creation, inventory allocation, and approval workflows. Replaces manual spreadsheet/email processes. Internal users only (no customer portal in Phase 1). Must integrate with Microsoft Entra for authentication and expose structured SQL data for downstream Fabric/Power BI analytics.
+Internal web application for REMarkets to manage sales-side bidding, offer creation, inventory allocation, and approval workflows. Replaces manual spreadsheet/email processes. Internal users only (no customer portal in Phase 1). Must integrate with Microsoft Entra for authentication. All data stored in clean, normalized SQL to support future analytics and AI use cases.
 
 ## Team
 
@@ -129,11 +129,10 @@ Internal web application for REMarkets to manage sales-side bidding, offer creat
 │  │  Normalized SQL Schema                                   │    │
 │  │  Users | Customers | Inventory | Offers | Bids           │    │
 │  │  Allocations | AuditLog | Configuration                  │    │
-│  └─────────────────────────┬───────────────────────────────┘    │
-│                            │                                     │
-│                    Consumed by Simpat                            │
-│                    Analytics Workstream                          │
-│                    (Data Lake → Warehouse → Power BI)            │
+│  └─────────────────────────────────────────────────────────┘    │
+│                                                                  │
+│                    Clean, normalized SQL                         │
+│                    Ready for future analytics consumption        │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -218,7 +217,7 @@ React Option:                          Blazor Option:
 | Future customer portal harder with Blazor | Low for Phase 1, Medium long-term | Can add WASM render mode later; or build portal as separate React app |
 | Fewer devs in market know Blazor | Medium — hiring harder | Offset by lower learning curve for .NET devs |
 | Azure access delays | High — blocks everything | Confirm access before Sprint 1; identify existing resources |
-| Schema must align with analytics workstream | Medium | Coordinate with Sean's team early |
+| Schema must support future analytics and customer portal | Medium | Design normalized SQL with future consumption in mind; document ER diagram thoroughly |
 
 ## Skill Gaps
 

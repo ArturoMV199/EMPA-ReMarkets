@@ -3,7 +3,7 @@
 
 ## Scope Summary
 
-Internal web application for REMarkets to replace spreadsheet/email-based bidding workflows. Covers bid management, inventory handling, allocation approvals, role-based access, customer masquerade, audit trails, and order-ready exports. Authentication via Microsoft Entra. Data exposed for downstream Fabric/Power BI analytics.
+Internal web application for REMarkets to replace spreadsheet/email-based bidding workflows. Covers bid management, inventory handling, allocation approvals, role-based access, customer masquerade, audit trails, and order-ready exports. Authentication via Microsoft Entra. All data stored in clean, normalized SQL for future analytics consumption.
 
 ## Architecture Summary
 
@@ -103,13 +103,13 @@ Important features that can be delivered after MVP is stable.
 | 42 | Bulk bid operations (approve/reject multiple at once) |
 | 43 | Advanced search and filtering across all entities |
 | 44 | Email notifications on approval status changes |
-| 45 | Data export API for analytics team direct consumption |
+| 45 | Data export API for future external consumption |
 | 46 | User activity log (who logged in when) |
 
 ### Out of Scope (Won't Have)
 
 - Customer-facing portal (future phase)
-- In-app analytics dashboards (Fabric/Power BI separate workstream)
+- In-app analytics dashboards (future consideration)
 - Commodities pricing database / AI training data
 - Mobile application
 - Integration with external ERP or order management systems

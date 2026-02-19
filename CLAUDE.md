@@ -7,7 +7,7 @@ It provides project context, EMPA methodology state, and decision history so Cla
 
 ## What is this project?
 
-This is an **EMPA (Estimation Methodology Plus Assessments)** template repository. EMPA is a framework where Claude acts as an active team member driving discovery, architecture, prototyping, estimation, and tracking through conversation.
+**EMPA-ReMarkets** — Bid Intelligence Platform for REMarkets, built using the EMPA (Estimation Methodology Plus Assessments) framework. This is the first real project using EMPA.
 
 Full methodology: `docs/methodology.md`
 Claude instructions: `docs/claude-project-instructions.md`
@@ -19,56 +19,111 @@ Quick start: `docs/quick-start.md`
 ## EMPA Phases
 
 ```
-1. Discover  → project-charter.md
-2. Architect → architecture-decision.md
-2B. Prototype → prototype/ folder (HTML + inline SVGs + CSS variables)
-3. Estimate  → estimation.md
-4. Execute   → weekly-status.md (per week)
-5. Reflect   → lessons-learned.md
+1. Discover  → project-charter.md              ✅ COMPLETE
+2. Architect → architecture-decision-*.md       ✅ COMPLETE (2 options generated)
+2B. Prototype → prototype/ folder               ✅ COMPLETE (6 screens)
+3. Estimate  → estimation-*.md                  ✅ COMPLETE (2 options generated)
+4. Execute   → weekly-status.md (per week)      ⏳ NOT STARTED
+5. Reflect   → lessons-learned.md               ⏳ NOT STARTED
 ```
 
 ---
 
 ## Current Project State
 
-**Status:** Template repository — no active project yet
-**Current Phase:** N/A
-**Last Updated:** 2026-02-18
-
-<!-- 
-When using this template for a real project, update this section:
-
-**Status:** Active
-**Project Name:** EMPA-[ProjectName]
-**Client:** [Name]
-**Current Phase:** [Discover / Architect / Prototype / Estimate / Execute / Reflect]
-**Last Updated:** [Date]
+**Status:** Active — Pre-Execution (pending architecture decision)
+**Project Name:** EMPA-ReMarkets
+**Client:** REMarkets
+**Consulting Firm:** Simpat
+**Current Phase:** Between Estimate and Execute — waiting on Blazor vs React decision
+**Last Updated:** 2026-02-19
 
 ### Decisions Made
-- [Date] Charter approved: [summary]
-- [Date] Architecture decided: [stack summary]
-- [Date] Prototype delivered: [screens built]
-- [Date] Estimation approved: [total hours, MVP scope]
+- 2026-02-19: Charter completed — full scope, 14 stakeholders, 10 risks identified
+- 2026-02-19: Two architecture options generated (React + .NET 10 vs Blazor + .NET 10)
+- 2026-02-19: Prototype delivered — 6 screens (Login, Dashboard, Offers, Inventory, Allocations, Customers)
+- 2026-02-19: Two estimations completed (one per architecture option)
 
-### Current Sprint/Week
-- Week [#]: [focus area]
-- Blockers: [any blockers]
-- Next: [what's coming]
+### Pending Decision: Blazor vs React
+
+| Metric | React + .NET 10 | Blazor + .NET 10 |
+|--------|-----------------|-------------------|
+| Total Hours | ~1,130 hrs | ~970 hrs |
+| MVP Timeline (2 devs) | ~11 weeks | ~9.5 weeks |
+| MVP Timeline (3 devs) | ~7.5 weeks | ~6 weeks |
+| Learning Curve | ~100 hrs | ~56 hrs |
+| In-cell editing (core feature) | ⭐⭐⭐⭐⭐ AG Grid | ⭐⭐⭐⭐ MudBlazor |
+| Future customer portal | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ |
+| Hiring future devs | ⭐⭐⭐⭐⭐ | ⭐⭐ |
+| CI/CD complexity | Medium (2 deploys) | Low (1 deploy) |
+
+**Bottom line:** Blazor saves ~160 hrs and ~2 weeks. React costs more upfront but has better grid editing, hiring pool, and future portal path.
 
 ### Key Context
-- Team: [names and roles]
-- Stack: [tech stack summary]
-- Environments: [Dev/Test/Staging/Prod]
-- CI/CD: [platform and strategy]
-- Repo: [GitHub URL]
--->
+- **Team:** 2 Fullstack .NET Developers (possible 3rd), new hires — skill levels TBD
+- **Existing Dev:** Part-time support/advisor, familiar with Simpat/REMarkets systems
+- **Stack:** .NET 10 + Azure SQL + Microsoft Entra (frontend framework TBD)
+- **Environments:** Dev, Test, Prod (TBD if Azure infra already exists)
+- **CI/CD:** TBD — depends on architecture decision
+- **QA:** No dedicated QA — Sales Team and Product Owners handle UAT
+- **No Designer:** UI/UX is Simpat's responsibility (prototype serves as design reference)
+- **Technical Leadership:** REMarkets wants Simpat to lead all technical decisions
+- **Engagement Style:** Client prefers fixed-bid over T&M
+- **Business Context:** Server components (RAM, CPUs) — high-volume part-number-level transactions; auctions run weekly
+
+### Stakeholders
+- **Executive Sponsor:** Zack Sexton
+- **Product Owners:** Kim Jensen, Tim Murphy, Bobby Pronto
+- **Sales Stakeholders:** Jerry Lee, Jessica Xia, Vincent Lievaart, Henry Chien, Chris Cox, Grey Player
+- **Finance/Compliance:** Chelsie White, Avery Wolfe, Sara Ruiz
+
+### TBDs That Impact Estimation
+- Azure environments — already provisioned or need setup?
+- Dev team React/Blazor experience levels
+- 3rd developer available?
+- AG Grid Community vs Enterprise (if React chosen)
+- IaC required (Bicep)?
+
+---
+
+## Project Scope Summary
+
+Internal web app replacing spreadsheet/email-based bidding workflows:
+- Bid & Offer Management (create, track, in-cell editing)
+- Inventory Handling (bulk upload CSV/Excel, state tracking, grouping)
+- Allocation & Approval Workflow (aggregated view, configurable thresholds, escalation)
+- Customer Management (CRUD, assignment, masquerade with audit)
+- Role-based Access (Sales Rep, Sales Manager, Admin, Finance read-only, Executive read-only)
+- Audit Trail (immutable logging for all tracked actions)
+- Order-ready Exports (CSV/PDF after approval)
+- Data Foundation (normalized SQL for future analytics consumption)
+
+### Out of Scope (Phase 1)
+- Analytics dashboards (future consideration)
+- Customer-facing portal (future phase)
+- Mobile app
+- Email/notifications
+- ERP integration
+
+---
+
+## Prototype Screens
+
+All in `prototype/` folder — raw HTML, inline SVGs, CSS variables, Inter font:
+- `index.html` — Login (Microsoft Entra SSO)
+- `dashboard.html` — Main dashboard with KPI cards and recent activity
+- `offers.html` — Offer management with bid line items
+- `inventory.html` — Inventory list with state tracking and bulk upload
+- `allocations.html` — Allocation view with approval workflow
+- `customers.html` — Customer management with rep assignment
 
 ---
 
 ## Rules for Claude
 
 - **Language:** Documents and deliverables in English. Conversation can be in Spanish.
-- **Prototypes:** Raw HTML + custom CSS. Inline SVG icons ONLY — never Font Awesome or external icon CDNs. CSS variables for brand colors. Realistic placeholder data.
+- **Prototypes:** Raw HTML + custom CSS. Inline SVG icons ONLY — never Font Awesome or external icon CDNs. CSS variables for brand colors. Fictional/invented placeholder data (never use real client data unless Arturo provides it explicitly).
 - **Estimation:** Include ALL work — infra per environment, CI/CD, DevOps, QA, learning curve, bug buffer. Map tasks to team members.
 - **Always read** `docs/methodology.md` before starting any EMPA phase.
 - **Update this file** after every major decision or phase completion.
+- **Commits:** Unique, descriptive messages — never repeat the same commit message.

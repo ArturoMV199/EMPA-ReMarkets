@@ -11,9 +11,9 @@
 
 ## Business Problem
 
-REMarkets currently manages its internal sales-side bidding, offer creation, inventory allocation, and approval workflows through spreadsheets and email. This manual process creates delays in bid turnaround, lacks governance and audit trails, introduces pricing and margin exceptions without oversight, and prevents reliable historical data capture for analytics.
+REMarkets has evolved from refurbished laptops to server components (RAM sticks, CPUs, and parts pulled from servers), dealing in high-volume part-number-level transactions. Currently, salespeople manage bidding, offer creation, inventory allocation, and approval workflows through spreadsheets and email — "shoveling spreadsheets all over the place." Once a week, they compare their spreadsheets to determine winners. This manual process creates delays in bid turnaround, lacks governance and audit trails, introduces pricing and margin exceptions without oversight, and prevents reliable historical data capture for future analytics.
 
-They need a centralized web application that replaces these manual workflows with a governed, auditable platform — starting with internal users only (no external customer portal in Phase 1).
+They need a centralized web application that replaces these manual workflows with a governed, auditable platform — starting with internal users only (no external customer portal in Phase 1). The platform is designed from the start to support a future customer portal, but Phase 1 is strictly internal.
 
 ## Objectives
 
@@ -21,31 +21,34 @@ They need a centralized web application that replaces these manual workflows wit
 2. Enforce governed approval workflows for all bids and allocations
 3. Provide complete, immutable audit trails for compliance and finance
 4. Reduce offer-to-allocation approval time to ≤1 business day (target), ≤2 days (max)
-5. Capture 100% of winning and losing bids as structured data
-6. Establish a clean data foundation for downstream analytics (Fabric / Power BI)
-7. Build a modular platform that supports future phases (customer portal, AI training)
+5. Capture 100% of winning and losing bids as structured data at part-number level
+6. Build a modular platform that supports future phases (customer portal, AI-driven pricing intelligence)
+7. Ensure all captured data is stored in clean, normalized SQL suitable for future analytics consumption
 
 ## Scope
 
 ### In Scope (Phase 1 — Web Application)
-- Bid & Offer Management (create, track, edit offers and line-item bids)
-- Inventory Handling (bulk upload, grouping, state tracking, partial/split allocations)
-- Allocation & Order Readiness (aggregated view, approval workflow, order-ready exports)
+- Bid & Offer Management (create, track, edit offers and line-item bids at part-number level)
+- Auction mechanics (offers have start/end dates with exact timing to month/day/hour/minute; bids are editable until deadline, then locked)
+- Inventory Handling (bulk CSV/Excel upload with prescribed template; additive uploads — same part number uploaded twice accumulates, never overwrites; upload event tracking with filename, upload date UTC, uploader identity, individual batch IDs)
+- Inventory state tracking (Available, Committed, Released) with grouping into offers/lots
+- Allocation & Order Readiness (aggregated view auto-suggesting highest bidder per part number, with manager override capability; split/partial allocations across customers; approval workflow; order-ready exports)
 - Permissions & Approvals (role-based access, configurable thresholds, escalation paths)
-- Customer Management (CRUD, assignment to reps, audit logging)
-- Customer Masquerade (act-on-behalf capability with full attribution)
+- Customer Management (CRUD, assignment to reps, audit logging; platform designed to support future customer portal)
+- Customer Masquerade (sales reps enter bids on behalf of customers with full attribution — in Phase 1, nearly all bids will be entered this way since there is no customer portal)
+- Bid History (only latest bid displayed by default, but full history of prior bids retained and viewable)
 - Audit & Compliance (immutable logging for all tracked actions)
-- Data Foundation (normalized SQL, historical retention, exposed for Fabric ingestion)
-- Authentication via Microsoft Entra
+- Authentication via Microsoft Entra (all internal roles through AD/Entra)
 - Role-based UI: Sales Rep, Sales Manager, Administrator, Finance (read-only), Executive (read-only)
 
 ### Out of Scope
-- Analytics dashboards (built separately in Fabric / Power BI by Simpat analytics workstream)
+- In-app analytics or dashboards (future consideration — data is captured cleanly to support this later)
 - Customer-facing portal (future phase — data model designed to support it)
 - Commodities pricing database for AI training (future scope per client doc)
 - Mobile application
 - Email/notification system (not mentioned in requirements)
-- Integration with external ERP or order management systems
+- Integration with external ERP, Grid, or order management systems (allocations are exported and integrated manually for now; possible future integration)
+- Real-time data requirements (auctions happen once per week — no heavy concurrent load expected)
 
 ## Deliverables
 
@@ -92,7 +95,7 @@ They need a centralized web application that replaces these manual workflows wit
 | UAT Complete | TBD |
 | Production Go-Live | TBD |
 
-*Note: Timeline will be populated after estimation phase. Client's internal PMO has a committee review window and Simpat analytics workstream targets Q2 for showing numbers — the web app timeline should consider data availability needs for the analytics team.*
+*Note: Timeline will be populated after estimation phase. REMarkets' new CEO (Zack Sexton) considers this a top priority — decision expected within ~2 weeks of receiving the proposal. Client has expressed preference for a fixed-bid engagement over time-and-materials.*
 
 ## Assumptions
 
@@ -104,21 +107,27 @@ They need a centralized web application that replaces these manual workflows wit
 - No historical data migration is required for Phase 1 — the platform starts with an empty database and inventory is uploaded via CSV/Excel
 - The application does not need to send emails or push notifications in Phase 1
 - Bid sheets will still be shared with customers over email/Excel outside the platform (stated in scoping doc)
-- Analytics/reporting is handled entirely outside the app via Fabric/Power BI by a separate Simpat workstream
 - All source code and artifacts are REMarkets intellectual property
+- The team is comfortable with AI-assisted development, provided all code and IP belong to REMarkets
+- Client prefers a fixed-bid engagement structure (stated by Tim Murphy referencing CFO preference)
+- REMarkets business operates in server components (RAM, CPUs, etc.) — not refurbished laptops; part numbers and quantities are the core data units
+- Auctions operate on a weekly cycle — no real-time performance requirements anticipated
+- No direct integration with external systems (Grid or other) in Phase 1 — exports are manual
+- The schema is a blank slate; REMarkets wants Simpat to lead technical decisions and best practices
 
 ## Constraints
 
-- **Platform:** Must be built on Microsoft Azure (client requirement)
-- **Authentication:** Must use Microsoft Entra (client requirement)
+- **Platform:** Must be built on Microsoft Azure (client requirement — currently consolidating all Azure resources)
+- **Authentication:** Must use Microsoft Entra (client requirement — "all internal roles through AD/Entra")
 - **Database:** Must be centralized SQL (client requirement)
 - **Team Size:** 2 developers (possibly 3) — limits parallelization
 - **Team Experience:** New dev hires — skill levels with specific .NET frameworks/Azure services are unknown
-- **Budget:** Not disclosed — must stay within Simpat's allocated budget
-- **Deadline:** No hard deadline provided, but client's analytics team targets Q2 2026 for reports — implies data needs to be flowing by then
+- **Budget:** Not disclosed — client prefers fixed-bid engagement; CFO is cost-conscious ("historically, projects have been perceived as black holes" from exec viewpoint)
+- **Deadline:** No hard deadline, but new CEO considers this a top priority; decision expected within ~2 weeks
 - **IP:** All code and artifacts are REMarkets property, transferable at project end
 - **No dedicated DevOps:** Infrastructure setup falls on the dev team
 - **No dedicated Designer:** UI/UX decisions are Simpat's responsibility
+- **Technical leadership:** REMarkets explicitly wants Simpat to lead technical decisions and best practices — they provide business requirements, not software direction
 
 ## Success Criteria
 
@@ -130,8 +139,8 @@ They need a centralized web application that replaces these manual workflows wit
 6. Complete audit trail available for all bid, approval, and allocation actions
 7. Order-ready exports generated immediately after approval
 8. Finance, Sales, and Operations sign off on usability, control, and data integrity
-9. Structured, normalized data accessible for downstream Fabric/Power BI ingestion
-10. Platform is production-ready for internal use and establishes foundation for future phases
+9. All data stored in clean, normalized SQL suitable for future analytics consumption
+10. Platform is production-ready for internal use and establishes foundation for future phases (customer portal, AI)
 
 ## Known Risks
 
@@ -141,20 +150,19 @@ They need a centralized web application that replaces these manual workflows wit
 | Azure access/configuration delays | Medium | High | Confirm access early; identify if existing infra can be leveraged |
 | Scope creep from 3 Product Owners | Medium | High | Strict change management; reference this charter for scope decisions |
 | No dedicated QA resource | Medium | Medium | Build automated testing into dev workflow; structured UAT with sales team |
-| Analytics workstream dependency | Medium | Medium | Coordinate data schema with Simpat analytics team early; ensure SQL is clean and documented |
 | No designer — UI quality risk | Medium | Medium | Prototype phase as design reference; iterate with Product Owners |
-| Client expects fast delivery (Q2 analytics target) | Medium | High | Set realistic timeline in estimation; communicate dependencies clearly |
+| Client expects fast delivery (CEO top priority) | Medium | High | Set realistic timeline in estimation; communicate dependencies clearly |
+| Fixed-bid preference may constrain flexibility | Medium | High | Define clear MVP scope with MoSCoW; articulate what's included vs. optional with pricing transparency |
 | Unclear DevOps ownership | Medium | Medium | Assign infra responsibilities during architecture phase; leverage existing Azure setup if available |
 | Customer masquerade complexity (audit + permissions) | Medium | Medium | Design carefully in architecture phase; allocate appropriate buffer in estimation |
 | Partial/split allocation logic complexity | Medium | Medium | Define clear business rules during architecture; prototype the workflow |
+| New leadership team (CEO, CFO turnover) | Low | Medium | Engage current decision-makers (Tim, Bobby); document all approvals; be prepared for priority shifts |
 
-## Relationship to Other Workstreams
+## Future Phases (Not in Scope — Design Considerations Only)
 
-This project is one of two active Simpat workstreams with REMarkets:
+The following are explicitly out of Phase 1 scope but influence design decisions now:
 
-1. **Bid Intelligence Platform (this project)** — Web application for internal bid management
-2. **Data/Analytics Workstream** — Warehouse objects, data moves from data lake, Power BI reports
-
-The web application writes structured data to SQL. The analytics workstream (Ansar's team handles data lake ingestion, Sean's team handles warehouse/BI) consumes that data downstream. Schema coordination between the two workstreams is critical.
-
-Key contacts on the analytics side: Ansar (data lake), Sean (warehouse/BI), Tanya (analyst familiar with data lake objects).
+1. **Customer Portal (Phase 2)** — The data model and customer management are designed to support future external customer access. The masquerade feature establishes the pattern for customer-level actions.
+2. **Analytics & Reporting** — No in-app dashboards. However, all data is stored in clean, normalized SQL to support future analytics consumption. The schema should be well-documented for downstream use.
+3. **AI-Driven Pricing Intelligence** — REMarkets wants to leverage captured bid data for future AI training. The structured data capture (winning/losing bids, pricing history, part-number-level detail) establishes the foundation.
+4. **System Integration** — Future integration with Grid or other order management systems. Phase 1 uses manual exports; the architecture should not preclude API-based integration later.

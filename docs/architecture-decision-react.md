@@ -3,7 +3,7 @@
 
 ## Project Context
 
-Internal web application for REMarkets to manage sales-side bidding, offer creation, inventory allocation, and approval workflows. Replaces manual spreadsheet/email processes. Internal users only (no customer portal in Phase 1). Must integrate with Microsoft Entra for authentication and expose structured SQL data for downstream Fabric/Power BI analytics.
+Internal web application for REMarkets to manage sales-side bidding, offer creation, inventory allocation, and approval workflows. Replaces manual spreadsheet/email processes. Internal users only (no customer portal in Phase 1). Must integrate with Microsoft Entra for authentication. All data stored in clean, normalized SQL to support future analytics and AI use cases.
 
 ## Team
 
@@ -128,11 +128,10 @@ Internal web application for REMarkets to manage sales-side bidding, offer creat
 │  │  Normalized SQL Schema                                   │    │
 │  │  Users | Customers | Inventory | Offers | Bids           │    │
 │  │  Allocations | AuditLog | Configuration                  │    │
-│  └─────────────────────────┬───────────────────────────────┘    │
-│                            │                                     │
-│                    Consumed by Simpat                            │
-│                    Analytics Workstream                          │
-│                    (Data Lake → Warehouse → Power BI)            │
+│  └─────────────────────────────────────────────────────────┘    │
+│                                                                  │
+│                    Clean, normalized SQL                         │
+│                    Ready for future analytics consumption        │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -211,7 +210,7 @@ Internal web application for REMarkets to manage sales-side bidding, offer creat
 | AG Grid Community insufficient for in-cell editing needs | Medium — may need Enterprise license ($1K/dev) | Evaluate during Sprint 0 with prototype data |
 | Two separate deploys (frontend + API) | Low — more CI/CD complexity | Automated pipeline handles both; can co-host in same App Service |
 | Azure access delays | High — blocks environment setup | Confirm access before Sprint 1; identify existing resources |
-| Schema must align with analytics workstream | Medium — wrong schema = rework | Coordinate with Sean's team early; share ER diagram before coding |
+| Schema must support future analytics and customer portal | Medium — wrong schema = rework later | Design normalized SQL with future consumption in mind; document ER diagram thoroughly |
 | TypeScript learning curve on top of React | Medium — adds time | Use strict but pragmatic TS config; don't over-type early |
 
 ## Skill Gaps
