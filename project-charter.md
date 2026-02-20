@@ -35,7 +35,7 @@ They need a centralized web application that replaces these manual workflows wit
 - Allocation & Order Readiness (aggregated view auto-suggesting highest bidder per part number, with manager override capability; split/partial allocations across customers; approval workflow; order-ready exports)
 - Permissions & Approvals (role-based access, configurable thresholds, escalation paths)
 - Customer Management (CRUD, assignment to reps, audit logging; platform designed to support future customer portal)
-- Customer Masquerade (sales reps enter bids on behalf of customers with full attribution — in Phase 1, nearly all bids will be entered this way since there is no customer portal)
+- Act-on-Behalf (sales reps enter bids on behalf of customers with full attribution — in Phase 1, nearly all bids will be entered this way since there is no customer portal)
 - Bid History (only latest bid displayed by default, but full history of prior bids retained and viewable)
 - Audit & Compliance (immutable logging for all tracked actions)
 - Authentication via Microsoft Entra (all internal roles through AD/Entra)
@@ -154,7 +154,7 @@ They need a centralized web application that replaces these manual workflows wit
 | Client expects fast delivery (CEO top priority) | Medium | High | Set realistic timeline in estimation; communicate dependencies clearly |
 | Fixed-bid preference may constrain flexibility | Medium | High | Define clear MVP scope with MoSCoW; articulate what's included vs. optional with pricing transparency |
 | Unclear DevOps ownership | Medium | Medium | Assign infra responsibilities during architecture phase; leverage existing Azure setup if available |
-| Customer masquerade complexity (audit + permissions) | Medium | Medium | Design carefully in architecture phase; allocate appropriate buffer in estimation |
+| Act-on-behalf complexity (audit + permissions) | Medium | Medium | Design carefully in architecture phase; allocate appropriate buffer in estimation |
 | Partial/split allocation logic complexity | Medium | Medium | Define clear business rules during architecture; prototype the workflow |
 | New leadership team (CEO, CFO turnover) | Low | Medium | Engage current decision-makers (Tim, Bobby); document all approvals; be prepared for priority shifts |
 
@@ -162,7 +162,7 @@ They need a centralized web application that replaces these manual workflows wit
 
 The following are explicitly out of Phase 1 scope but influence design decisions now:
 
-1. **Customer Portal (Phase 2)** — The data model and customer management are designed to support future external customer access. The masquerade feature establishes the pattern for customer-level actions.
+1. **Customer Portal (Phase 2)** — The data model and customer management are designed to support future external customer access. The act-on-behalf feature establishes the pattern for customer-level actions.
 2. **Analytics & Reporting** — No in-app dashboards. However, all data is stored in clean, normalized SQL to support future analytics consumption. The schema should be well-documented for downstream use.
 3. **AI-Driven Pricing Intelligence** — REMarkets wants to leverage captured bid data for future AI training. The structured data capture (winning/losing bids, pricing history, part-number-level detail) establishes the foundation.
 4. **System Integration** — Future integration with Grid or other order management systems. Phase 1 uses manual exports; the architecture should not preclude API-based integration later.

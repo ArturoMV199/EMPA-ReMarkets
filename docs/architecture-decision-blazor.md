@@ -22,7 +22,7 @@ Internal web application for REMarkets to manage sales-side bidding, offer creat
 - Inventory state tracking (Available, Committed, Released)
 - Partial and split allocations across customers
 - Aggregated allocation view with approval workflow
-- Customer masquerade (act-on-behalf) with full audit attribution
+- Act-on-behalf (sales enters bids for customers) with full audit attribution
 - Role-based access (5 roles with different permissions)
 - Configurable approval thresholds and escalation paths
 - Order-ready exports (CSV/PDF)
