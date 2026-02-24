@@ -757,6 +757,99 @@ th.text-center {
 .badge-info .badge-dot { background: var(--brand-accent); }
 .badge-neutral .badge-dot { background: var(--brand-gray-400); }
 
+.badge-floor {
+    background: #FFF3E0;
+    color: #E65100;
+    font-weight: 600;
+}
+.badge-floor .badge-dot { background: #E65100; }
+
+.badge-tie {
+    background: #F3E5F5;
+    color: #7B1FA2;
+    font-weight: 600;
+}
+.badge-tie .badge-dot { background: #7B1FA2; }
+
+.badge-reversed {
+    background: #FAFAFA;
+    color: var(--brand-gray-500);
+    text-decoration: line-through;
+}
+.badge-reversed .badge-dot { background: var(--brand-gray-400); }
+
+.btn-reverse {
+    background: none;
+    border: 1px solid var(--brand-gray-300);
+    color: var(--brand-gray-600);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+.btn-reverse:hover {
+    border-color: var(--brand-danger);
+    color: var(--brand-danger);
+}
+.btn-reverse svg {
+    width: 14px;
+    height: 14px;
+}
+
+.reversal-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+.reversal-modal {
+    background: white;
+    border-radius: 12px;
+    padding: 28px;
+    width: 420px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+}
+.reversal-modal h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--brand-gray-800);
+    margin: 0 0 4px;
+}
+.reversal-modal p {
+    font-size: 13px;
+    color: var(--brand-gray-500);
+    margin: 0 0 16px;
+}
+.reversal-modal label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--brand-gray-700);
+    display: block;
+    margin-bottom: 6px;
+}
+.reversal-modal select,
+.reversal-modal textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--brand-gray-200);
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 14px;
+    font-family: inherit;
+}
+.reversal-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 8px;
+}
+
 /* ==========================================
    FILTERS BAR
    ========================================== */
@@ -1591,6 +1684,7 @@ th.text-center {
                         <div class="approval-header">
                             <span class="approval-title">OFF-2026-0146 — CoreStack Distributors</span>
                             <span class="badge badge-warning"><span class="badge-dot"></span>Pending (2h)</span>
+                            <span class="badge badge-floor"><span class="badge-dot"></span>Below Floor</span>
                         </div>
                         <div class="approval-meta">Submitted by Jerry Lee · Feb 19, 2026 at 10:35 AM</div>
                         <div class="approval-details">
@@ -1634,6 +1728,7 @@ th.text-center {
                         <div class="approval-header">
                             <span class="approval-title">OFF-2026-0141 — Vertex Infrastructure LLC</span>
                             <span class="badge badge-warning"><span class="badge-dot"></span>Pending (5h)</span>
+                            <span class="badge badge-tie"><span class="badge-dot"></span>Tie — Resolve</span>
                         </div>
                         <div class="approval-meta">Submitted by Jessica Xia · Feb 19, 2026 at 7:50 AM</div>
                         <div class="approval-details">
@@ -1685,6 +1780,7 @@ th.text-center {
                                     <th>Approved By</th>
                                     <th>Date</th>
                                     <th>Status</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -1696,6 +1792,7 @@ th.text-center {
                                     <td>Kim Jensen</td>
                                     <td class="cell-muted">Feb 16, 2026</td>
                                     <td><span class="badge badge-success"><span class="badge-dot"></span>Approved</span></td>
+                                    <td><button class="btn-reverse"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg> Reverse</button></td>
                                 </tr>
                                 <tr>
                                     <td><span class="cell-link">OFF-2026-0144</span></td>
@@ -1705,18 +1802,44 @@ th.text-center {
                                     <td>Kim Jensen</td>
                                     <td class="cell-muted">Feb 15, 2026</td>
                                     <td><span class="badge badge-success"><span class="badge-dot"></span>Approved</span></td>
+                                    <td><button class="btn-reverse"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg> Reverse</button></td>
                                 </tr>
-                                <tr>
+                                <tr style="opacity: 0.6;">
                                     <td><span class="cell-link">OFF-2026-0142</span></td>
                                     <td class="cell-bold">Great Plains Commodities</td>
                                     <td>Chris Cox</td>
-                                    <td class="text-right cell-bold">$324,100</td>
+                                    <td class="text-right cell-bold" style="text-decoration: line-through;">$324,100</td>
                                     <td>Kim Jensen</td>
                                     <td class="cell-muted">Feb 14, 2026</td>
-                                    <td><span class="badge badge-success"><span class="badge-dot"></span>Approved</span></td>
+                                    <td><span class="badge badge-reversed"><span class="badge-dot"></span>Reversed</span></td>
+                                    <td><span class="cell-muted" style="font-size: 12px;">Reason: Customer cancelled order</span></td>
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reversal Reason Modal (prototype) -->
+            <div class="reversal-modal-overlay" id="reversalModal">
+                <div class="reversal-modal">
+                    <h3>Reverse Allocation</h3>
+                    <p>OFF-2026-0145 — Ironclad Computing. ($512,800)</p>
+                    <label>Reason Code (required)</label>
+                    <select>
+                        <option value="">Select a reason...</option>
+                        <option value="customer_cancel">Customer cancelled order</option>
+                        <option value="pricing_error">Pricing error</option>
+                        <option value="inventory_issue">Inventory discrepancy</option>
+                        <option value="duplicate">Duplicate allocation</option>
+                        <option value="other">Other (specify below)</option>
+                    </select>
+                    <label>Additional Notes</label>
+                    <textarea rows="3" placeholder="Optional details about this reversal..."></textarea>
+                    <p style="font-size: 12px; color: var(--brand-danger); margin-bottom: 0;">⚠ This will return all committed inventory to Available and lock the existing export. This action is audited and cannot be undone.</p>
+                    <div class="reversal-modal-actions">
+                        <button class="btn btn-secondary btn-sm">Cancel</button>
+                        <button class="btn btn-danger btn-sm">Confirm Reversal</button>
                     </div>
                 </div>
             </div>
