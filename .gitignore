@@ -1,3 +1,7 @@
+# Word temporary/lock files
+~$*.docx
+~$*.doc
+
 # OS
 .DS_Store
 Thumbs.db
