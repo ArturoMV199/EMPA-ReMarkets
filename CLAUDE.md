@@ -26,7 +26,7 @@ Scope changes: `docs/SC_XXX/scope-changes.json` → generator: `docs/gen-scope-c
 2. Architect → architecture-decision-*.md       ✅ COMPLETE (Blazor confirmed)
 2B. Prototype → prototype/ folder               ✅ COMPLETE (6 screens)
 3. Estimate  → estimation-blazor.md             ✅ COMPLETE (updated with Q&A: MVP ~990 hrs)
-3B. Scope Changes → scope-changes.json          ✅ ACTIVE (SC-001: A1–A10 logged, +184 hrs net)
+3B. Scope Changes → scope-changes.json          ✅ ACTIVE (SC-001: A1–A10 logged, +146 hrs net)
 4. Execute   → weekly-status.md (per week)      ⏳ NOT STARTED
 5. Reflect   → lessons-learned.md               ⏳ NOT STARTED
 ```
@@ -59,7 +59,7 @@ Scope changes: `docs/SC_XXX/scope-changes.json` → generator: `docs/gen-scope-c
 - 2026-02-23: Discovery questions document created (docs/discovery-questions.md) — 10 answered from client Q&A, 27 open questions sent to client awaiting response
 - 2026-02-23: Estimation updated with confirmed Q&A answers: MVP ~990 hrs, Full Scope ~1,163 hrs (Auth Option A)
 - 2026-02-23: Prototypes updated: inventory.html (Part #, Condition, master/source description), allocations.html (Below Floor, Tie, Reverse, Reversed), offers.html (bid revision indicators)
-- 2026-02-24: Scope Change Register created (docs/scope-changes.json) — SC-001: all 10 client answers (A1–A10) logged with evidence, 5 confirmed (0 hrs), 4 added (+140 hrs), 1 modified (-9 hrs), bug buffer recalc (+15 hrs) = net +184 hrs
+- 2026-02-24: Scope Change Register created (docs/SC_001/scope-changes.docx) — SC-001: all 10 client answers (A1–A10) logged with evidence, 5 confirmed (0 hrs), 4 added (+140 hrs), 1 modified (-9 hrs), bug buffer recalc (+15 hrs) = net +146 hrs. Baseline removed from document — official estimation says ~806 MVP but original items sum ~844. Scope change tracks only deltas and current totals (~990 MVP, ~1,163 full scope). Do not attempt to reconcile baseline discrepancy.
 
 ### Pending Decisions
 
