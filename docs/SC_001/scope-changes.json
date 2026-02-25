@@ -1,13 +1,13 @@
 {
-  "project": "EMPA-ReMarkets — Bid Intelligence Platform",
+  "project": "ReMarkets — Bid Intelligence Platform",
   "option": "Option B — Blazor Web App + .NET 10",
   "baseline": {
     "date": "2026-02-20",
-    "mvpHours": 806,
+    "mvpHours": 990,
     "postMvpHours": 117,
     "learningHours": 56,
-    "fullScopeHours": 980,
-    "note": "Initial estimation before client Q&A. Act-on-Behalf and Split Allocations already in MVP as client-requested."
+    "fullScopeHours": 1163,
+    "note": "Current estimation after SC-001. Baseline section removed from deliverable — see CLAUDE.md for context."
   },
   "changes": [
     {
@@ -16,33 +16,42 @@
       "batch": "Client Q&A — Answers A1–A10",
       "items": [
         {
-          "trigger": "A1 — Offer Lifecycle States",
-          "clientAnswer": "Offers follow the lifecycle: Draft → Scheduled → Active → Closed → Allocating → Approved → Exported. Reversed and Cancelled are terminal states reachable from Approved.",
+          "trigger": "A1 — Authentication: Azure Roles",
+          "clientAnswer": "Yes — authentication should be handled via Microsoft Entra (Azure AD), and application roles can be mapped from Entra roles or group membership. Application role enforcement must still exist at the application layer, not only at the identity layer.",
           "changeType": "confirmed",
-          "description": "Confirmed offer lifecycle already modeled in estimation. State transitions covered in item #16.",
-          "estimationItems": ["#16 State transitions (24 hrs) — already included"],
-          "hoursAdded": 0,
-          "hoursRemoved": 0,
-          "netImpact": 0,
-          "module": "Inventory Management"
-        },
-        {
-          "trigger": "A2 — Role Definitions",
-          "clientAnswer": "Five roles confirmed: Sales Rep, Sales Manager, Admin, Finance, Executive. Sales Reps enter bids and act on behalf of customers. Sales Managers approve allocations. Admin has full system access. Finance and Executive have read-only access to reports and exports.",
-          "changeType": "confirmed",
-          "description": "Confirmed 5-role structure already in estimation. Azure AD Groups (Option A) maps directly to these roles.",
-          "estimationItems": ["#5 Azure AD Group setup — 5 groups (15 hrs) — already included", "#7 AuthorizeView components (14 hrs) — already included"],
+          "description": "Confirmed Azure AD Groups as auth approach (Option A). App-layer enforcement already included in estimation.",
+          "estimationItems": [
+            "#4 Entra integration (18 hrs) — already included",
+            "#5 Azure AD Group setup (15 hrs) — already included",
+            "#6 Dynamic role-based authorization (21 hrs) — already included"
+          ],
           "hoursAdded": 0,
           "hoursRemoved": 0,
           "netImpact": 0,
           "module": "Authentication & Authorization"
         },
         {
+          "trigger": "A2 — Import: Sample CSV File",
+          "clientAnswer": "No CSV sample yet, but provided mock InventoryItem schema with fields: ID, InventorySource, PartNumber, Description, WarehouseLocation, Condition, QtyTotal, QtyCommitted, QtyAvailable, Uom, Status, SaleTypeTag, MetadataJson. Constraints: QtyCommitted ≤ QtyTotal, both ≥ 0.",
+          "changeType": "confirmed",
+          "description": "Confirmed inventory schema fields. No CSV template yet but schema clarity reduces Sprint 0 risk. Parsing + validation already covered in estimation.",
+          "estimationItems": [
+            "#11 Bulk CSV/Excel upload (48 hrs) — already included"
+          ],
+          "hoursAdded": 0,
+          "hoursRemoved": 0,
+          "netImpact": 0,
+          "module": "Inventory Management"
+        },
+        {
           "trigger": "A3 — Inventory Identity",
           "clientAnswer": "Each inventory item is identified by a composite key: PartNumber + Condition + Location + Grade. Master description is maintained separately — net-new items populate master automatically; existing items retain source description only; master changes require Admin/Manager action.",
           "changeType": "added",
           "description": "Added inventory identity logic — composite uniqueness enforcement + master vs source description management",
-          "estimationItems": ["#12 Inventory identity — composite uniqueness (40 hrs)", "#13 Inventory adjustment records (21 hrs)"],
+          "estimationItems": [
+            "#12 Inventory identity — composite uniqueness (40 hrs)",
+            "#13 Inventory adjustment records (21 hrs)"
+          ],
           "hoursAdded": 61,
           "hoursRemoved": 0,
           "netImpact": 61,
@@ -53,7 +62,9 @@
           "clientAnswer": "Inventory uploads are CSV files with standard columns: PartNumber, Description, Quantity, Condition, Location, Grade, Cost. Uploads always create new adjustment records — never overwrite existing inventory.",
           "changeType": "confirmed",
           "description": "Confirmed CSV upload format and behavior already modeled in estimation. Parsing + validation covered in item #11.",
-          "estimationItems": ["#11 Bulk CSV/Excel upload (48 hrs) — already included"],
+          "estimationItems": [
+            "#11 Bulk CSV/Excel upload (48 hrs) — already included"
+          ],
           "hoursAdded": 0,
           "hoursRemoved": 0,
           "netImpact": 0,
@@ -64,18 +75,23 @@
           "clientAnswer": "One active bid per customer per line item per offer. When a bid is updated, the system creates a new revision (rev 2, rev 3, etc.) — previous revisions are retained for audit but only the latest is active.",
           "changeType": "added",
           "description": "Added bid uniqueness enforcement + revision tracking (one active bid per customer/line/offer, previous revisions retained for audit)",
-          "estimationItems": ["#20 Bid uniqueness enforcement + revision tracking (15 hrs)"],
+          "estimationItems": [
+            "#20 Bid uniqueness enforcement + revision tracking (15 hrs)"
+          ],
           "hoursAdded": 15,
           "hoursRemoved": 0,
           "netImpact": 15,
           "module": "Bid & Offer Management"
         },
         {
-          "trigger": "A6 — Pricing Types",
-          "clientAnswer": "Three bid types confirmed: standard bid (customer offers a price), BIN (Buy It Now — fixed price set by REMarkets), and target pricing (REMarkets sets a target, customers bid against it). All three are per line item.",
+          "trigger": "A6 — Bid Validation Rules",
+          "clientAnswer": "Validation rules: Quantity ≤ available inventory (unless partial allocation later), Quantity > 0, Price > 0, Offer must be active (within date range), Customer context required, User role enforcement.",
           "changeType": "confirmed",
-          "description": "Confirmed three bid types already modeled in estimation. Covered in item #21.",
-          "estimationItems": ["#21 Bid types support — bid/BIN/target pricing (18 hrs) — already included"],
+          "description": "Confirmed standard validation rules already modeled in estimation. No additional validation beyond what was assumed.",
+          "estimationItems": [
+            "#19 MudBlazor DataGrid — in-cell editing (56 hrs) — validation included",
+            "#21 Bid types support (18 hrs) — validation included"
+          ],
           "hoursAdded": 0,
           "hoursRemoved": 0,
           "netImpact": 0,
@@ -86,7 +102,9 @@
           "clientAnswer": "When two or more bids tie on price/quantity, the system surfaces the tie to the Sales Manager. Manager resolves manually by selecting the winning bid — no automatic tie-breaking logic.",
           "changeType": "added",
           "description": "Added tie detection logic + resolution UI (system surfaces tied bids, manager picks winner manually)",
-          "estimationItems": ["#31 Tie detection logic + resolution UI (12 hrs)"],
+          "estimationItems": [
+            "#31 Tie detection logic + resolution UI (12 hrs)"
+          ],
           "hoursAdded": 12,
           "hoursRemoved": 0,
           "netImpact": 12,
@@ -97,7 +115,10 @@
           "clientAnswer": "Full reversal must be supported in Phase 1. When an allocation is reversed: inventory returns to Available status, the allocation is marked as Reversed (with reason code), and the export is locked/invalidated.",
           "changeType": "added",
           "description": "Added full allocation reversal support — return inventory to Available, mark Reversed, lock/regenerate export, require reason code with audit trail",
-          "estimationItems": ["#29 Allocation reversal logic (40 hrs)", "#30 Reversal reason code + audit trail (12 hrs)"],
+          "estimationItems": [
+            "#29 Allocation reversal logic (40 hrs)",
+            "#30 Reversal reason code + audit trail (12 hrs)"
+          ],
           "hoursAdded": 52,
           "hoursRemoved": 0,
           "netImpact": 52,
@@ -108,31 +129,38 @@
           "clientAnswer": "All allocations are manager-approved in Phase 1. No automatic approval thresholds. However, the system should show a visual 'below floor' warning when pricing is below a configurable floor — visual only, no auto-reject.",
           "changeType": "modified",
           "description": "Simplified approval from configurable thresholds (21 hrs) to visual-only 'below floor' indicator (12 hrs). Thresholds moved to future phase.",
-          "estimationItems": ["#27 changed: Approval thresholds (21 hrs) → Visual pricing indicators (12 hrs)"],
+          "estimationItems": [
+            "#27 changed: Approval thresholds (21 hrs) → Visual pricing indicators (12 hrs)"
+          ],
           "hoursAdded": 12,
           "hoursRemoved": 21,
           "netImpact": -9,
           "module": "Allocation & Approval Workflow"
         },
         {
-          "trigger": "A10 — Export Format",
-          "clientAnswer": "Phase 1 export is CSV only. Approved allocations are exported as a flat CSV file with standard columns for the downstream order management system. PDF exports are a nice-to-have for post-MVP.",
+          "trigger": "A10 — Approval Authority: Manager vs Admin",
+          "clientAnswer": "Sales Manager: within defined authority. Admin: full authority including override. Do not limit approval to manager only — admin must have escalation power.",
           "changeType": "confirmed",
-          "description": "Confirmed CSV export already in MVP (item #37). PDF export stays in Post-MVP (item #43) as planned.",
-          "estimationItems": ["#37 CSV export from approved allocations (10 hrs) — already included", "#43 PDF export — Post-MVP (21 hrs) — already included"],
+          "description": "Confirmed both Sales Manager and Admin can approve allocations. Admin has full override authority. Already covered in role-based access design.",
+          "estimationItems": [
+            "#26 Approval workflow (48 hrs) — already includes manager + admin paths",
+            "#6 Dynamic role-based authorization (21 hrs) — already included"
+          ],
           "hoursAdded": 0,
           "hoursRemoved": 0,
           "netImpact": 0,
-          "module": "Order-Ready Exports"
+          "module": "Allocation & Approval Workflow"
         },
         {
           "trigger": "Bug Buffer Recalculation",
           "clientAnswer": "N/A — automatic recalculation based on new MVP total",
           "changeType": "modified",
-          "description": "Bug buffer recalculated at 10% of new MVP hours (~900 hrs pre-buffer = 90 hrs, up from 75 hrs)",
-          "estimationItems": ["#41 Bug fixing buffer: 75 hrs → 90 hrs"],
-          "hoursAdded": 15,
-          "hoursRemoved": 0,
+          "description": "Bug buffer recalculated from 10% of pre-buffer MVP. Was 75 hrs (10% of ~750), now 90 hrs (10% of ~900).",
+          "estimationItems": [
+            "#41 Bug fixing buffer: 75 hrs → 90 hrs"
+          ],
+          "hoursAdded": 90,
+          "hoursRemoved": 75,
           "netImpact": 15,
           "module": "Testing & Bug Buffer"
         }
@@ -140,12 +168,12 @@
       "summary": {
         "totalAdded": 167,
         "totalRemoved": 21,
-        "netImpact": 184,
-        "mvpBefore": 806,
+        "netImpact": 146,
+        "mvpBefore": null,
         "mvpAfter": 990,
-        "fullScopeBefore": 980,
+        "fullScopeBefore": null,
         "fullScopeAfter": 1163,
-        "note": "Net +184 hrs to MVP. 11 items processed from client answers A1–A10: 5 confirmed existing assumptions (no impact), 4 added new scope (+140 hrs), 1 modified existing scope (-9 hrs), plus bug buffer recalculation (+15 hrs)."
+        "note": "Client Q&A answers A1-A10: 5 confirmed (no impact), 4 added (+140 hrs new features), 1 modified (-9 hrs thresholds simplified), bug buffer recalculated (+15 hrs). Net impact: +146 hrs to MVP."
       }
     }
   ]

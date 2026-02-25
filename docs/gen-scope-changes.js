@@ -299,7 +299,7 @@ const doc = new Document({
         headers: { default: new Header({ children: [new Paragraph({
             children: [
                 new TextRun({ text: "Scope Change Register", font: "Arial", size: 16, color: G500 }),
-                new TextRun({ text: "\tEMPA Framework \u2014 Simpat Tech", font: "Arial", size: 16, color: G500 }),
+                new TextRun({ text: "\tSimpat Tech", font: "Arial", size: 16, color: G500 }),
             ],
             tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
             border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: BRAND, space: 4 } },
