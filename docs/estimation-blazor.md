@@ -72,6 +72,7 @@ Without these, the project fails to replace the current spreadsheet/email proces
 | **Inventory Management** | | | | | | | |
 | 11 | Inventory | Bulk CSV/Excel upload (parsing + validation + error handling) | High | 24 | ×2.0 | 48 | File parsing edge cases |
 | 12 | Inventory | Inventory identity — composite uniqueness (PartNumber + condition + location + grade) + master vs source description logic | High | 20 | ×2.0 | 40 | Client-confirmed: net-new → populate master; existing → retain source description only; master changes require Admin/Manager action |
+| 12b | Inventory | Master description edit UI (searchable list + inline edit + Admin/Sales Manager restriction). Audit covered by #35 generic interceptor. No approval step required. | Low | 6 | ×1.2 | 8 | SC-002 A15: Client confirmed dedicated UI, fully audited, no separate approval |
 | 13 | Inventory | Inventory adjustment records (each upload row = distinct transaction: batch ID, user, timestamp, qty, source file) | Medium | 14 | ×1.5 | 21 | Client-confirmed: never silently merge — full audit trail per upload row |
 | 14 | Inventory | Inventory list view with state tracking (Available/Committed/Released) | Medium | 14 | ×1.5 | 21 | |
 | 15 | Inventory | Inventory grouping into offers | Medium | 12 | ×1.5 | 18 | |
@@ -112,7 +113,7 @@ Without these, the project fails to replace the current spreadsheet/email proces
 | 40 | QA | Integration tests (API/page endpoints) | Medium | 14 | ×1.5 | 21 | |
 | 41 | QA | Bug fixing buffer (10% of MVP hours) | — | — | — | 90 | Based on ~900 hrs pre-buffer |
 
-| | | | | **MVP Total** | | **~990 hrs** | |
+| | | | | **MVP Total** | | **~998 hrs** | |
 
 ---
 
@@ -189,28 +190,28 @@ Features that add value after MVP is stable. Labeled as client-requested or sugg
 
 | Concept | Hours |
 |---------|-------|
-| MVP (Must Have) — with Auth Option A: Azure AD Groups | ~990 hrs |
-| MVP (Must Have) — with Auth Option B: Internal DB Roles | ~1,014 hrs |
+| MVP (Must Have) — with Auth Option A: Azure AD Groups | ~998 hrs |
+| MVP (Must Have) — with Auth Option B: Internal DB Roles | ~1,022 hrs |
 | Post-MVP (Should Have) | ~117 hrs |
 | Learning Curve | ~56 hrs |
-| **Full Scope (MVP + Post-MVP + Learning) — Auth Option A** | **~1,163 hrs** |
-| **Full Scope (MVP + Post-MVP + Learning) — Auth Option B** | **~1,187 hrs** |
+| **Full Scope (MVP + Post-MVP + Learning) — Auth Option A** | **~1,171 hrs** |
+| **Full Scope (MVP + Post-MVP + Learning) — Auth Option B** | **~1,195 hrs** |
 
-*Updated Feb 2026 after client Q&A. Items added from confirmed answers: inventory identity/dedupe (+61 hrs), bid uniqueness enforcement (+15 hrs), allocation reversal (+52 hrs), tie-breaker resolution (+12 hrs), "below floor" visual indicator (+12 hrs). Approval thresholds simplified to visual-only in Phase 1 (-9 hrs). Act-on-Behalf and Split Allocations remain in MVP as client-requested. 27 discovery questions still open — answers may further impact estimation.*
+*Updated Feb 2026 after client Q&A. SC-001: inventory identity/dedupe (+61 hrs), bid uniqueness (+15 hrs), allocation reversal (+52 hrs), tie-breaker (+12 hrs), below floor indicator (+12 hrs), thresholds simplified (-9 hrs), bug buffer recalc (+15 hrs) = +146 hrs. SC-002: master description edit UI (+8 hrs), 4 confirmed (0 hrs), 1 confirmed with Post-MVP note (0 hrs) = +8 hrs.*
 
 ### Timeline Scenarios — Auth Option A (2 developers, 8 hrs/day each = 80 hrs/week)
 
 | Scenario | Scope | Hours | Working Weeks | Calendar Estimate |
 |----------|-------|-------|---------------|-------------------|
-| MVP only | Must Have + Learning | ~1,046 hrs | ~13 weeks | ~3.25 months |
-| MVP + Post-MVP | Full Phase 1 | ~1,163 hrs | ~14.5 weeks | ~3.6 months |
+| MVP only | Must Have + Learning | ~1,054 hrs | ~13.2 weeks | ~3.3 months |
+| MVP + Post-MVP | Full Phase 1 | ~1,171 hrs | ~14.6 weeks | ~3.65 months |
 
 ### With 3 developers (120 hrs/week)
 
 | Scenario | Scope | Hours | Working Weeks | Calendar Estimate |
 |----------|-------|-------|---------------|-------------------|
-| MVP only | Must Have + Learning | ~1,046 hrs | ~8.5 weeks | ~2.1 months |
-| MVP + Post-MVP | Full Phase 1 | ~1,163 hrs | ~9.7 weeks | ~2.4 months |
+| MVP only | Must Have + Learning | ~1,054 hrs | ~8.8 weeks | ~2.2 months |
+| MVP + Post-MVP | Full Phase 1 | ~1,171 hrs | ~9.8 weeks | ~2.45 months |
 
 *Auth Option B adds ~24 hrs to all scenarios. Timelines assume devs are productive from week 1 after learning curve. Actual ramp-up may add 1-2 weeks. Timelines do not include UAT cycles with client.*
 
@@ -233,14 +234,14 @@ Features that add value after MVP is stable. Labeled as client-requested or sugg
 
 | Metric | React + .NET 10 | Blazor Web App + .NET 10 | Difference |
 |--------|----------------|-------------------------|------------|
-| MVP Hours (Auth Option A) | ~1,100 hrs* | ~990 hrs | Blazor saves ~110 hrs (10%) |
+| MVP Hours (Auth Option A) | ~1,100 hrs* | ~998 hrs | Blazor saves ~102 hrs (9%) |
 | Post-MVP Hours | ~126 hrs | ~117 hrs | Blazor saves ~9 hrs |
 | Learning Curve | ~100 hrs | ~56 hrs | Blazor saves ~44 hrs (44% less) |
-| **Total Hours (Auth Option A)** | **~1,326 hrs*** | **~1,163 hrs** | **Blazor saves ~163 hrs (12%)** |
-| MVP Timeline (2 devs) | ~15 weeks* | ~13 weeks | Blazor ~2 weeks faster |
-| Full Scope Timeline (2 devs) | ~16.5 weeks* | ~14.5 weeks | Blazor ~2 weeks faster |
-| MVP Timeline (3 devs) | ~10 weeks* | ~8.5 weeks | Blazor ~1.5 weeks faster |
-| Full Scope Timeline (3 devs) | ~11 weeks* | ~9.7 weeks | Blazor ~1.3 weeks faster |
+| **Total Hours (Auth Option A)** | **~1,326 hrs*** | **~1,171 hrs** | **Blazor saves ~155 hrs (12%)** |
+| MVP Timeline (2 devs) | ~15 weeks* | ~13.2 weeks | Blazor ~1.8 weeks faster |
+| Full Scope Timeline (2 devs) | ~16.5 weeks* | ~14.6 weeks | Blazor ~1.9 weeks faster |
+| MVP Timeline (3 devs) | ~10 weeks* | ~8.8 weeks | Blazor ~1.2 weeks faster |
+| Full Scope Timeline (3 devs) | ~11 weeks* | ~9.8 weeks | Blazor ~1.2 weeks faster |
 | In-cell editing quality | ⭐⭐⭐⭐⭐ AG Grid | ⭐⭐⭐⭐ MudBlazor | React has better grid |
 | Future customer portal | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | React better long-term |
 | Hiring future devs | ⭐⭐⭐⭐⭐ | ⭐⭐ | React market is larger |

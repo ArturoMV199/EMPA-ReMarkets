@@ -21,6 +21,42 @@ Answers should be documented here as they come in, with date and source.
 
 These questions were already asked and answered. Documented here for traceability.
 
+### Offer Lifecycle
+
+| # | Question | Answer | Impact | Date |
+|---|----------|--------|--------|------|
+| A11 | What are the exact offer statuses and transitions? | Six states: Draft, Active, Closed, Allocating, Finalized (Approved), Cancelled. Exported and Reversed are allocation-level events, not offer statuses. | Simplified from proposed 9 states to 6. No hour change — simpler state machine, already covered in #17/#18. | 2026-02 |
+
+### Bid Validation
+
+| # | Question | Answer | Impact | Date |
+|---|----------|--------|--------|------|
+| A12 | Do we enforce bid qty <= available at entry, or allow oversubscription? | Strict: bid qty must be <= current available at time of entry. No oversubscription Phase 1. Partial allocation only at allocation stage — customer can bid 100, admin allocates 60, but cannot bid 500 if only 100 exists. | Confirms simple validation path. No hour change. Architecture note: keep validation in app layer (not DB constraint) for Phase 2 flexibility. | 2026-02 |
+
+### Split Allocation Representation
+
+| # | Question | Answer | Impact | Date |
+|---|----------|--------|--------|------|
+| A13 | One allocation record with children, or multiple flat records per customer? | Multiple allocation records per customer per inventory line. Reasons: cleaner audit, cleaner export, simpler reporting, easier reversal, avoids nested structure complexity. | Confirms flat record approach. No hour change — already modeled in #34. | 2026-02 |
+
+### Export
+
+| # | Question | Answer | Impact | Date |
+|---|----------|--------|--------|------|
+| A14 | What data needs to be exported? CSV only? Who consumes it? | CSV format required. Columns: Part Number, Description, Customer, Allocated Quantity, Approved Price, Extended Value, Allocation Approval Timestamp, Offer ID, Allocation ID. Keep it simple. | Confirms CSV export (#37, 10 hrs MVP). PDF export (#43, 21 hrs Post-MVP) likely no longer needed. 1 row per allocation record (Allocation ID column confirms flat export). No hour change. | 2026-02 |
+
+### Master Data
+
+| # | Question | Answer | Impact | Date |
+|---|----------|--------|--------|------|
+| A15 | Do you want a dedicated UI for master description edits? Approval required? | Dedicated UI, restricted to Admin and Sales Manager, fully audited, no separate approval step. | **+8 hrs** — new item #12b: master description edit UI. Audit covered by existing #35 generic interceptor. | 2026-02 |
+
+### Audit UX
+
+| # | Question | Answer | Impact | Date |
+|---|----------|--------|--------|------|
+| A16 | In-app audit viewer in Phase 1, or capture-only? | Capture immutable records + basic in-app viewing at entity level (bid history, allocation changes on a record). No full enterprise audit search console Phase 1. Advanced querying downstream in reporting. | Confirms #36 (21 hrs) entity-level viewer in MVP. #44 (15 hrs) advanced views stays Post-MVP. No hour change. | 2026-02 |
+
 ### Authentication
 
 | # | Question | Answer | Impact | Date |
@@ -59,14 +95,9 @@ These questions were already asked and answered. Documented here for traceabilit
 
 | # | Question | Why it matters | Potential impact |
 |---|----------|---------------|-----------------|
-| Q1 | What are the exact offer statuses and transitions? We propose: Draft → Scheduled → Active → Closed → Allocating → Approved → Exported. Plus Reversed and Cancelled as terminal states. Does this match your workflow, or are there missing/extra states? | This defines the entire offer state machine — every screen, validation, and business rule depends on it. Getting this wrong means rework across the whole app. | +8-24 hrs depending on complexity of transitions and edge cases (e.g., can you go from Closed back to Active?) |
 | Q2 | Do you want offer templates to reuse previous offer structures? | Weekly auctions with similar inventory = repetitive setup. Templates could save sales reps significant time. | +12-20 hrs if yes, but high ROI for users |
 
 ### 🔴 Bid Validation & Oversubscription
-
-| # | Question | Why it matters | Potential impact |
-|---|----------|---------------|-----------------|
-| Q3 | For bidding validation, do we always enforce bid qty ≤ current available at bid entry time, or allow "oversubscription" bids and handle shortages during allocation? | The client's Q&A says "Qty ≤ available inventory (unless partial allocation later)" — the "unless" is ambiguous. If we enforce strictly at entry, a customer can't bid for 100 units when only 80 are available even if partial allocation is intended. If we allow oversubscription, the allocation step needs shortage resolution logic. | High — changes bid validation rules AND allocation workflow. Locking this avoids rework. |
 
 ### 🔴 Timezone & Concurrency
 
@@ -74,6 +105,12 @@ These questions were already asked and answered. Documented here for traceabilit
 |---|----------|---------------|-----------------|
 | Q4 | What timezone for auction start/end times? Display in user's local time or company time? | Bid deadlines to the minute require clear timezone handling. Wrong timezone = wrong deadline. | +4-8 hrs for timezone-aware datetime handling |
 | Q5 | Can two reps edit bids on the same offer simultaneously? If so, how handle conflicts? | Blazor Interactive Server uses SignalR — real-time capable but need conflict resolution strategy. | +8-16 hrs if optimistic concurrency + conflict UI needed |
+
+### 🔴 Inventory & Offer Cross-Reference (NEW — identified during SC-002 analysis)
+
+| # | Question | Why it matters | Potential impact |
+|---|----------|---------------|-----------------|
+| Q28 | Can the same inventory line appear in multiple active offers at the same time? | The client confirmed bid qty must not exceed current available at time of entry. This works when inventory lives in one offer at a time. But if the same line is in Offer A and Offer B simultaneously, both offers accept bids against the same available qty. When Offer A allocates and commits, Offer B's valid bids may exceed what remains. This isn't oversubscription (each bid was valid when entered) but creates the same conflict at allocation time. We need to know: allow it (warn admin at allocation), prevent it (lock inventory to one offer), or track reserved-per-offer qty. Directly affects allocation workflow (#26, 48 hrs) and inventory commitment (#28, 18 hrs). | **Phase 1 critical** — must resolve before Sprint 1. Could add +8-16 hrs if reservation-per-offer tracking needed. |
 
 ### 🔴 Inventory Gaps
 
@@ -97,9 +134,7 @@ These questions were already asked and answered. Documented here for traceabilit
 
 | # | Question | Why it matters | Potential impact |
 |---|----------|---------------|-----------------|
-| Q14 | After partial/split allocation, what happens to remaining inventory? Back to Available? Stays in pending pool? | Affects inventory state machine and whether remaining qty can be re-offered. | Architecture decision — impacts state transitions |
-| Q15 | When allocations split a line item across customers, how to represent it — one allocation record with children, or multiple allocation records per customer? | Affects DB schema, audit trail structure, and export format. One-with-children = cleaner audit but more complex queries. Multiple records = simpler queries but harder to see the "original whole." | Architecture decision — must lock before Sprint 1 |
-| Q16 | What data needs to be exported from approved allocations? Specific columns, field order, date formats? CSV only? Who consumes this export — ERP, finance system, or manual process? | Wrong export format = manual rework by finance. Need spec before building export. | Minimal hour impact but blocks export item delivery |
+| Q14 | After partial/split allocation, what happens to remaining inventory? Back to Available? Stays in pending pool? Admin decides? | Affects inventory state machine, bid status lifecycle, and whether remaining qty can be re-offered. Connected to A12 confirmation of partial allocation. Three options identified (auto-release, hold pending, admin decides) — each changes state transitions in #16, #22, #26, #34. | **Phase 1 critical** — 138 hrs of combined work depends on this answer. Must resolve before Sprint 1. |
 | Q17 | One export per customer order, or consolidated exports across customers? | Affects export generation logic and UI. | +4-8 hrs if multiple export formats needed |
 
 ### 🔴 Dashboard & Reporting
@@ -108,13 +143,6 @@ These questions were already asked and answered. Documented here for traceabilit
 |---|----------|---------------|-----------------|
 | Q18 | Dashboard KPIs — what exactly do you want to see? Revenue? Win rate? Bid volume? Inventory turnover? | Current estimation has "Dashboard with KPI cards" but no defined metrics. Vague scope = vague delivery. | Could range from simple (4-6 static KPIs) to complex (dynamic filtering, date ranges) |
 | Q19 | Does Finance need audit reports beyond the audit trail UI? Sales performance reports? | If yes, report generation is a separate feature not currently estimated. | +16-24 hrs per report type |
-
-### 🔴 Master Data & Audit UX
-
-| # | Question | Why it matters | Potential impact |
-|---|----------|---------------|-----------------|
-| Q20 | For master description handling — do you want a dedicated UI to update master descriptions, and does that require approval and audit? | Client confirmed existing parts shouldn't have master description overwritten by upload. But the mechanism for intentional changes is undefined — could be a simple edit button (low effort) or a full approval workflow (high effort). | +8-12 hrs if dedicated UI with approval flow; +4 hrs if simple admin edit |
-| Q21 | Is an in-app audit viewer required in Phase 1 (search/filter by offer, inventory line, customer, user), or is capturing the audit records sufficient with the expectation that admins query via database or later reporting? | Currently estimation includes 21 hrs for audit trail UI (item 36). If they only need data capture with no viewer, that saves hours. If they want full search/filter, current estimate may not be enough. | -21 hrs if no UI needed; +8-12 hrs if full search/filter beyond current estimate |
 
 ### 🔴 Operations & Performance
 
@@ -144,12 +172,17 @@ These questions were already asked and answered. Documented here for traceabilit
 ### Priority Guidelines
 
 Ask these first — they have the highest estimation impact:
-- Q1 (Offer lifecycle states) — defines entire workflow
-- Q3 (Oversubscription vs strict validation) — changes bid + allocation logic
+- **Q14 (Unallocated qty after partial allocation) — Phase 1 CRITICAL, blocks state machine for 138 hrs of work**
+- **Q28 (Same inventory in multiple active offers) — Phase 1 CRITICAL, blocks allocation workflow**
 - Q10 (Multi-currency) — could add 40-60 hrs
 - Q5 (Concurrent editing) — architecture impact
-- Q15 (Split allocation representation) — affects schema, audit, exports
 - Q13 (BIN auto-allocate) — changes allocation flow
-- Q21 (Audit UX scope) — could save or add hours
 - Q22 (Performance/volume) — affects grid library decision
 - Q24 (In-app notifications) — affects workflow adoption
+- Q2 (Offer templates) — high ROI for users
+
+Previously high priority, now answered:
+- ~~Q1 (Offer lifecycle states)~~ → Answered as A11
+- ~~Q3 (Oversubscription vs strict validation)~~ → Answered as A12
+- ~~Q15 (Split allocation representation)~~ → Answered as A13
+- ~~Q21 (Audit UX scope)~~ → Answered as A16

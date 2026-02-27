@@ -14,7 +14,7 @@ Claude instructions: `docs/claude-project-instructions.md`
 Output formats: `docs/output-formats.md`
 Quick start: `docs/quick-start.md`
 Discovery questions: `docs/discovery-questions.md`
-Scope changes: `docs/SC_XXX/scope-changes.json` → generator: `docs/gen-scope-changes.js SC_XXX`
+Scope changes: `docs/SC_XXX/scope-changes.json` → generator: `docs/gen-scope-changes.js SC_XXX` (SC-001 and SC-002 active)
 
 ---
 
@@ -22,11 +22,11 @@ Scope changes: `docs/SC_XXX/scope-changes.json` → generator: `docs/gen-scope-c
 
 ```
 1. Discover  → project-charter.md              ✅ COMPLETE
-1B. Discovery Q&A → discovery-questions.md      🔄 IN PROGRESS (10 answered, 27 open — awaiting client)
+1B. Discovery Q&A → discovery-questions.md      🔄 IN PROGRESS (16 answered, 22 open — awaiting client)
 2. Architect → architecture-decision-*.md       ✅ COMPLETE (Blazor confirmed)
 2B. Prototype → prototype/ folder               ✅ COMPLETE (6 screens)
-3. Estimate  → estimation-blazor.md             ✅ COMPLETE (updated with Q&A: MVP ~990 hrs)
-3B. Scope Changes → scope-changes.json          ✅ ACTIVE (SC-001: A1–A10 logged, +146 hrs net)
+3. Estimate  → estimation-blazor.md             ✅ COMPLETE (updated with SC-002: MVP ~998 hrs)
+3B. Scope Changes → scope-changes.json          ✅ ACTIVE (SC-001: +146 hrs, SC-002: +8 hrs)
 4. Execute   → weekly-status.md (per week)      ⏳ NOT STARTED
 5. Reflect   → lessons-learned.md               ⏳ NOT STARTED
 ```
@@ -40,7 +40,7 @@ Scope changes: `docs/SC_XXX/scope-changes.json` → generator: `docs/gen-scope-c
 **Client:** REMarkets
 **Consulting Firm:** Simpat
 **Current Phase:** Between Estimate and Execute — Blazor + .NET 10 confirmed, Azure AD Groups confirmed
-**Last Updated:** 2026-02-23
+**Last Updated:** 2026-02-26
 
 ### Decisions Made
 - 2026-02-19: Charter completed — full scope, 14 stakeholders, 10 risks identified
@@ -60,6 +60,7 @@ Scope changes: `docs/SC_XXX/scope-changes.json` → generator: `docs/gen-scope-c
 - 2026-02-23: Estimation updated with confirmed Q&A answers: MVP ~990 hrs, Full Scope ~1,163 hrs (Auth Option A)
 - 2026-02-23: Prototypes updated: inventory.html (Part #, Condition, master/source description), allocations.html (Below Floor, Tie, Reverse, Reversed), offers.html (bid revision indicators)
 - 2026-02-24: Scope Change Register created (docs/SC_001/scope-changes.docx) — SC-001: all 10 client answers (A1–A10) logged with evidence, 5 confirmed (0 hrs), 4 added (+140 hrs), 1 modified (-9 hrs), bug buffer recalc (+15 hrs) = net +146 hrs. Baseline removed from document — official estimation says ~806 MVP but original items sum ~844. Scope change tracks only deltas and current totals (~990 MVP, ~1,163 full scope). Do not attempt to reconcile baseline discrepancy.
+- 2026-02-26: SC-002 created (docs/SC_002/scope-changes.json) — 6 client answers (A11–A16): offer lifecycle simplified to 6 states, strict bid validation confirmed (no oversubscription Phase 1), split allocations as flat records confirmed, CSV-only export with 9 columns defined, master description edit UI added (+8 hrs), entity-level audit viewer confirmed. Net +8 hrs. MVP ~990 → ~998. Two critical open questions identified: Q14 (unallocated qty after partial) and Q28 (same inventory in multiple active offers).
 
 ### Pending Decisions
 
@@ -67,8 +68,10 @@ Scope changes: `docs/SC_XXX/scope-changes.json` → generator: `docs/gen-scope-c
 - Start with MudBlazor DataGrid (MIT, $0) — evaluate if in-cell editing meets requirements
 - Fallback: Telerik (~$1K/dev/yr) or AG Grid Blazor (~$1.1K/dev one-time)
 
-**2. Discovery questions awaiting client response (27 open)**
-- Answers may impact estimation — do NOT update estimation until responses are confirmed
+**2. Discovery questions awaiting client response (22 open, 2 critical)**
+- **Q14 (CRITICAL): After partial allocation, what happens to unallocated qty?** — blocks state machine for 138 hrs of work
+- **Q28 (CRITICAL, NEW): Can same inventory line appear in multiple active offers?** — blocks allocation workflow
+- Remaining 20 open questions may impact estimation — do NOT update estimation until responses are confirmed
 - See `docs/discovery-questions.md` for full list and priority guidelines
 
 ### Key Context
@@ -97,7 +100,7 @@ Scope changes: `docs/SC_XXX/scope-changes.json` → generator: `docs/gen-scope-c
 - 3rd developer available?
 - MudBlazor DataGrid sufficient for in-cell editing? (evaluate Sprint 0)
 - Automated infrastructure setup required (Azure Bicep)?
-- **27 open discovery questions awaiting client response** — answers may add/reduce/change estimation items. See `docs/discovery-questions.md`
+- **22 open discovery questions awaiting client response (2 CRITICAL: Q14, Q28)** — answers may add/reduce/change estimation items. See `docs/discovery-questions.md`
 
 ---
 

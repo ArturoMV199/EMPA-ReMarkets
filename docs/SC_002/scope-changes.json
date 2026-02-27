@@ -1,0 +1,133 @@
+{
+  "project": "ReMarkets — Bid Intelligence Platform",
+  "option": "Option B — Blazor Web App + .NET 10",
+  "baseline": {
+    "date": "2026-02-24",
+    "mvpHours": 990,
+    "postMvpHours": 117,
+    "learningHours": 56,
+    "fullScopeHours": 1163,
+    "note": "Baseline is post-SC-001 estimation. See SC_001/scope-changes.json for previous changes."
+  },
+  "changes": [
+    {
+      "id": "SC-002",
+      "date": "2026-02-26",
+      "batch": "Client Q&A — Answers A11–A16 (2nd review round)",
+      "items": [
+        {
+          "trigger": "A11 — Offer Lifecycle States (Q1)",
+          "clientAnswer": "Six states: Draft, Active, Closed, Allocating, Finalized (Approved), Cancelled. Do NOT include Exported or Reversed as offer statuses — those are allocation-level events, not offer-level.",
+          "changeType": "confirmed",
+          "description": "Simplified from our proposed 9 states to 6. Exported and Reversed correctly moved to allocation-level events. Fewer states = simpler state machine. Already covered in estimation items #17/#18.",
+          "estimationItems": [
+            "#17 Create/Edit offers (21 hrs) — already included",
+            "#18 Offer list view with filtering and sorting (15 hrs) — already included"
+          ],
+          "hoursAdded": 0,
+          "hoursRemoved": 0,
+          "netImpact": 0,
+          "module": "Bid & Offer Management"
+        },
+        {
+          "trigger": "A12 — Bid Validation: No Oversubscription (Q3)",
+          "clientAnswer": "Enforce: Bid quantity must be <= current available quantity at time of entry. No oversubscription in Phase 1. Oversubscription introduces fairness logic, pro-rata allocation, complex shortage resolution, and edge-case disputes — that is Phase 2 territory. Partial allocation applies only at allocation stage: customer can bid for 100, admin may allocate only 60, but customer cannot bid for 500 if only 100 exists.",
+          "changeType": "confirmed",
+          "description": "Confirms the simple validation path already estimated. Strict enforcement at bid entry, partial allocation only at allocation stage. No additional logic needed. Architecture note: validation should be application-layer (not DB constraint) to allow Phase 2 oversubscription without schema changes.",
+          "estimationItems": [
+            "#19 MudBlazor DataGrid — in-cell editing (56 hrs) — validation included",
+            "#26 Approval workflow (48 hrs) — partial allocation at approval stage included"
+          ],
+          "hoursAdded": 0,
+          "hoursRemoved": 0,
+          "netImpact": 0,
+          "module": "Bid & Offer Management",
+          "architectureNotes": [
+            "Bid qty validation must be application-layer, not DB CHECK constraint — Phase 2 oversubscription will need to relax this rule without schema migration",
+            "Validation checks real-time available qty, not a snapshot from offer creation",
+            "OPEN: Q14 — what happens to unallocated qty after partial allocation (auto-release vs hold pending) — must resolve before Sprint 1",
+            "OPEN: Q28 — can same inventory line appear in multiple active offers simultaneously — must resolve before Sprint 1"
+          ]
+        },
+        {
+          "trigger": "A13 — Split Allocation Representation (Q15)",
+          "clientAnswer": "Multiple allocation records per customer per inventory line. Why: cleaner audit, cleaner export, simpler reporting, easier reversal, avoids nested allocation structure complexity.",
+          "changeType": "confirmed",
+          "description": "Confirmed flat multiple records (not parent-child). Already modeled in estimation item #34. Client rationale aligns with our recommended approach.",
+          "estimationItems": [
+            "#34 Partial/split allocations across customers (48 hrs) — already included"
+          ],
+          "hoursAdded": 0,
+          "hoursRemoved": 0,
+          "netImpact": 0,
+          "module": "Allocation & Approval Workflow"
+        },
+        {
+          "trigger": "A14 — Export Format and Columns (Q16)",
+          "clientAnswer": "CSV format required. Export columns: Part Number, Description, Customer, Allocated Quantity, Approved Price, Extended Value, Allocation Approval Timestamp, Offer ID, Allocation ID. Keep it simple.",
+          "changeType": "confirmed",
+          "description": "Confirms CSV-only export already in MVP (#37, 10 hrs). Nine columns defined — clear spec reduces Sprint 0 ambiguity. PDF export (#43, 21 hrs Post-MVP) likely no longer needed but not formally removed — client can revisit. Export is 1 row per allocation record (confirmed by inclusion of Allocation ID as column combined with A13 flat records).",
+          "estimationItems": [
+            "#37 CSV export from approved allocations (10 hrs) — already included",
+            "#43 PDF export (21 hrs Post-MVP) — likely unnecessary per 'keep it simple' but not formally removed"
+          ],
+          "hoursAdded": 0,
+          "hoursRemoved": 0,
+          "netImpact": 0,
+          "module": "Order-Ready Exports",
+          "postMvpNote": "PDF export (#43, 21 hrs) is likely no longer needed. Client said 'CSV format is required' and 'keep it simple.' Recommend removing from Post-MVP backlog if client confirms PDF is not needed in any phase."
+        },
+        {
+          "trigger": "A15 — Master Description Edit UI (Q20)",
+          "clientAnswer": "Dedicated UI to edit master description. Restricted to Admin and Sales Manager. Fully audited. No separate approval step.",
+          "changeType": "added",
+          "description": "New UI for editing master part descriptions. Backend logic for master vs source description already covered in #12 (40 hrs). Audit coverage provided by existing middleware #35 (24 hrs) — generic EF Core interceptor captures all entity changes including master description edits (who, when, old value, new value). No separate approval workflow needed (client explicitly said no). New scope is UI only: searchable list of master parts + inline edit form + role restriction to Admin/Sales Manager.",
+          "estimationItems": [
+            "NEW: Master description edit UI (search + inline edit + role restriction) — 8 hrs",
+            "#12 Inventory identity + master vs source description (40 hrs) — backend already covered",
+            "#35 Audit logging middleware (24 hrs) — generic interceptor already covers master description changes"
+          ],
+          "hoursAdded": 8,
+          "hoursRemoved": 0,
+          "netImpact": 8,
+          "module": "Inventory Management",
+          "auditCoverage": "Fully covered by existing item #35. The EF Core SaveChanges interceptor is entity-agnostic — it captures PropertyName, OldValue, NewValue, UserId, Timestamp, and ChangeSource for any tracked entity. Master description edits flow through the same interceptor as bid changes, allocation changes, and all other audited actions. No additional audit code required."
+        },
+        {
+          "trigger": "A16 — Audit UX Scope (Q21)",
+          "clientAnswer": "Application must capture immutable audit records and allow basic in-app audit viewing at entity level (e.g., bid history, allocation changes on a record). No full enterprise audit search console required in Phase 1. Advanced audit querying handled downstream in reporting.",
+          "changeType": "confirmed",
+          "description": "Confirms current estimation scope. Item #36 (21 hrs) covers entity-level audit viewing — click on a bid, see its change history; click on an allocation, see approval/reversal trail. Full search console (#44, 15 hrs) stays in Post-MVP as suggested enhancement, aligns with 'advanced querying handled downstream.'",
+          "estimationItems": [
+            "#36 Audit trail UI — view history per entity (21 hrs) — already included in MVP",
+            "#44 Advanced audit views (15 hrs) — stays in Post-MVP as suggested enhancement"
+          ],
+          "hoursAdded": 0,
+          "hoursRemoved": 0,
+          "netImpact": 0,
+          "module": "Audit & Compliance"
+        }
+      ],
+      "summary": {
+        "totalAdded": 8,
+        "totalRemoved": 0,
+        "netImpact": 8,
+        "mvpBefore": 990,
+        "mvpAfter": 998,
+        "postMvpBefore": 117,
+        "postMvpAfter": 117,
+        "learningBefore": 56,
+        "learningAfter": 56,
+        "fullScopeBefore": 1163,
+        "fullScopeAfter": 1171,
+        "bugBufferRecalc": false,
+        "bugBufferNote": "Net +8 hrs to MVP. Bug buffer delta would be +0.8 hrs (10% of 8). Not significant enough to recalculate — stays at 90 hrs.",
+        "note": "Client 2nd review round: 4 confirmed (no impact), 1 confirmed with Post-MVP note (PDF export likely removable), 1 added (+8 hrs master description edit UI). Clean round — mostly confirmations of existing estimates. Two critical open questions identified: Q14 (unallocated qty after partial) and Q28 (inventory in multiple active offers). Both must resolve before Sprint 1.",
+        "openQuestionsIdentified": [
+          "Q14 (existing) — After partial allocation, what happens to unallocated quantity? Auto-release, hold pending, or admin decides?",
+          "Q28 (new) — Can the same inventory line appear in multiple active offers simultaneously?"
+        ]
+      }
+    }
+  ]
+}
