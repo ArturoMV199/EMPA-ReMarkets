@@ -151,6 +151,7 @@ These questions were already asked and answered. Documented here for traceabilit
 | Q22 | How many concurrent users expected? How many line items per offer (100? 1,000? 10,000?)? How many active offers at once? | Performance requirements affect architecture decisions — especially for the in-cell editing grid. 10,000 rows in MudBlazor DataGrid behaves very differently than 100. | Could require virtualization, pagination strategy, or grid library change |
 | Q23 | Data retention policy — how long keep closed offers, old bids, audit records? | Affects database sizing, archival strategy, and potentially query performance over time. | Sprint 0 decision — minimal hour impact but important for infrastructure |
 | Q24 | In-app notifications needed? "Allocation pending your approval", "You've been outbid", "Offer closing in 1 hour"? | Even with email out of scope, in-app alerts could be essential for workflow adoption. Without them, managers won't know when to act. | +16-24 hrs (notification system + bell icon + read/unread state) |
+| Q29 | How many total end users will access the platform? Will external customers (buyers) ever access the system directly to submit bids? | Current infrastructure is sized for ~14+ internal users (identified stakeholders). If external customers access the platform, concurrent connections increase significantly — requires upgrading App Service (S1 to P1v3, +$171/mo), potentially SQL (S2 to S3, +$73/mo), and adding Azure SignalR Service. Also impacts auth model (Entra ID internal-only vs B2C for externals). | **Infrastructure + architecture impact** — could change monthly cost from ~$247 to ~$500+ and add +24-40 hrs for B2C auth |
 
 ### 🔴 User Experience
 
@@ -174,6 +175,7 @@ These questions were already asked and answered. Documented here for traceabilit
 Ask these first — they have the highest estimation impact:
 - **Q14 (Unallocated qty after partial allocation) — Phase 1 CRITICAL, blocks state machine for 138 hrs of work**
 - **Q28 (Same inventory in multiple active offers) — Phase 1 CRITICAL, blocks allocation workflow**
+- **Q29 (Total user count / external access) — infrastructure sizing depends on this, could double monthly cost**
 - Q10 (Multi-currency) — could add 40-60 hrs
 - Q5 (Concurrent editing) — architecture impact
 - Q13 (BIN auto-allocate) — changes allocation flow

@@ -22,7 +22,7 @@ Scope changes: `docs/SC_XXX/scope-changes.json` → generator: `docs/gen-scope-c
 
 ```
 1. Discover  → project-charter.md              ✅ COMPLETE
-1B. Discovery Q&A → discovery-questions.md      🔄 IN PROGRESS (16 answered, 22 open — awaiting client)
+1B. Discovery Q&A → discovery-questions.md      🔄 IN PROGRESS (16 answered, 23 open — awaiting client)
 2. Architect → architecture-decision-*.md       ✅ COMPLETE (Blazor confirmed)
 2B. Prototype → prototype/ folder               ✅ COMPLETE (6 screens)
 3. Estimate  → estimation-blazor.md             ✅ COMPLETE (updated with SC-002: MVP ~998 hrs)
@@ -61,6 +61,9 @@ Scope changes: `docs/SC_XXX/scope-changes.json` → generator: `docs/gen-scope-c
 - 2026-02-23: Prototypes updated: inventory.html (Part #, Condition, master/source description), allocations.html (Below Floor, Tie, Reverse, Reversed), offers.html (bid revision indicators)
 - 2026-02-24: Scope Change Register created (docs/SC_001/scope-changes.docx) — SC-001: all 10 client answers (A1–A10) logged with evidence, 5 confirmed (0 hrs), 4 added (+140 hrs), 1 modified (-9 hrs), bug buffer recalc (+15 hrs) = net +146 hrs. Baseline removed from document — official estimation says ~806 MVP but original items sum ~844. Scope change tracks only deltas and current totals (~990 MVP, ~1,163 full scope). Do not attempt to reconcile baseline discrepancy.
 - 2026-02-26: SC-002 created (docs/SC_002/scope-changes.json) — 6 client answers (A11–A16): offer lifecycle simplified to 6 states, strict bid validation confirmed (no oversubscription Phase 1), split allocations as flat records confirmed, CSV-only export with 9 columns defined, master description edit UI added (+8 hrs), entity-level audit viewer confirmed. Net +8 hrs. MVP ~990 → ~998. Two critical open questions identified: Q14 (unallocated qty after partial) and Q28 (same inventory in multiple active offers).
+- 2026-03-03: Azure Infrastructure PDF delivered (ReMarkets-Azure-Infrastructure-Cost-Estimate.pdf) -- 2 envs (PreProd B1 ~90/mo, Prod S1 ~157/mo), total ~247/mo (~2,964/yr), +6 hrs to estimation (MVP ~1,004, Full ~1,177).
+- 2026-03-03: Q29 added to discovery questions -- total user count never confirmed by client. ~14 was derived from counting charter stakeholders, not a client-provided number.
+- 2026-03-03: Client-facing PDF branding uses Simpat blue (#1e3a5f), NOT ReMarkets green (#488B37). ReMarkets green is for prototype UI only.
 
 ### Pending Decisions
 
@@ -68,9 +71,10 @@ Scope changes: `docs/SC_XXX/scope-changes.json` → generator: `docs/gen-scope-c
 - Start with MudBlazor DataGrid (MIT, $0) — evaluate if in-cell editing meets requirements
 - Fallback: Telerik (~$1K/dev/yr) or AG Grid Blazor (~$1.1K/dev one-time)
 
-**2. Discovery questions awaiting client response (22 open, 2 critical)**
+**2. Discovery questions awaiting client response (23 open, 3 critical)**
 - **Q14 (CRITICAL): After partial allocation, what happens to unallocated qty?** — blocks state machine for 138 hrs of work
-- **Q28 (CRITICAL, NEW): Can same inventory line appear in multiple active offers?** — blocks allocation workflow
+- **Q28 (CRITICAL): Can same inventory line appear in multiple active offers?** — blocks allocation workflow
+- **Q29 (CRITICAL): How many total users? Will external customers access the platform?** — infrastructure sizing depends on this, could double monthly cost
 - Remaining 20 open questions may impact estimation — do NOT update estimation until responses are confirmed
 - See `docs/discovery-questions.md` for full list and priority guidelines
 
@@ -96,11 +100,12 @@ Scope changes: `docs/SC_XXX/scope-changes.json` → generator: `docs/gen-scope-c
 - ~~Azure environments — already provisioned or need setup?~~ **CONFIRMED: exist**
 - ~~Auth approach — Azure AD Groups vs Internal DB Roles?~~ **CONFIRMED: Azure AD Groups (Option A)**
 - ~~Blazor vs React?~~ **CONFIRMED: Blazor + .NET 10**
+- **Total user count is UNCONFIRMED** (~14 derived from stakeholder list, never validated by client). If external users access platform, infra tier changes.
 - Dev team Blazor experience levels
 - 3rd developer available?
 - MudBlazor DataGrid sufficient for in-cell editing? (evaluate Sprint 0)
 - Automated infrastructure setup required (Azure Bicep)?
-- **22 open discovery questions awaiting client response (2 CRITICAL: Q14, Q28)** — answers may add/reduce/change estimation items. See `docs/discovery-questions.md`
+- **23 open discovery questions awaiting client response (3 CRITICAL: Q14, Q28, Q29)** — answers may add/reduce/change estimation items. See `docs/discovery-questions.md`
 
 ---
 
@@ -144,6 +149,7 @@ All in `prototype/` folder — raw HTML, inline SVGs, CSS variables, Inter font:
 ## Rules for Claude
 
 - **Language:** Documents and deliverables in English. Conversation can be in Spanish.
+- **Client-facing PDFs:** Use Simpat blue (#1e3a5f) branding. ReMarkets green (#488B37) is for prototype UI only.
 - **Prototypes:** Raw HTML + custom CSS. Inline SVG icons ONLY — never Font Awesome or external icon CDNs. CSS variables for brand colors. Fictional/invented placeholder data (never use real client data unless Arturo provides it explicitly).
 - **Estimation:** Include ALL work — infra per environment, CI/CD, DevOps, QA, learning curve, bug buffer. Map tasks to team members.
 - **Always read** `docs/methodology.md` before starting any EMPA phase.
