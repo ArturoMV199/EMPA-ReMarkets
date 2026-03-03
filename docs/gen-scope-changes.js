@@ -227,6 +227,31 @@ function buildBatchSummary(summary) {
                 children: [new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: impactText(summary.netImpact), bold: true, font: "Arial", size: 19, color: W })] })] }),
         ]}),
     ];
+    // Add timeline rows if timelineContext is present in summary JSON
+    if (summary.timelineContext) {
+        const t2 = summary.timelineContext.twoDevs;
+        const t3 = summary.timelineContext.threeDevs;
+        rows.push(new TableRow({ children: [
+            tc("MVP Timeline (2 devs)", cw[0], { shade: G100, bold: true }),
+            tc("", cw[1], { shade: G100 }),
+            tc(`~${t2.mvpMonths} months (~${t2.mvpWeeks} wks)`, cw[2], { shade: G100, align: AlignmentType.RIGHT, bold: true }),
+        ]}));
+        rows.push(new TableRow({ children: [
+            tc("Full Scope (2 devs)", cw[0], { bold: true }),
+            tc("", cw[1]),
+            tc(`~${t2.fullMonths} months (~${t2.fullWeeks} wks)`, cw[2], { align: AlignmentType.RIGHT, bold: true }),
+        ]}));
+        rows.push(new TableRow({ children: [
+            tc("MVP Timeline (3 devs)", cw[0], { shade: G100, bold: true }),
+            tc("", cw[1], { shade: G100 }),
+            tc(`~${t3.mvpMonths} months (~${t3.mvpWeeks} wks)`, cw[2], { shade: G100, align: AlignmentType.RIGHT, bold: true }),
+        ]}));
+        rows.push(new TableRow({ children: [
+            tc("Full Scope (3 devs)", cw[0], { bold: true }),
+            tc("", cw[1]),
+            tc(`~${t3.fullMonths} months (~${t3.fullWeeks} wks)`, cw[2], { align: AlignmentType.RIGHT, bold: true }),
+        ]}));
+    }
     return new Table({ width: { size: PW, type: WidthType.DXA }, columnWidths: cw, rows });
 }
 
@@ -248,6 +273,13 @@ function buildCumulativeTable() {
         new TableRow({ children: [tc("Original Full Scope", cw[0]), tc(`~${data.baseline.fullScopeHours} hrs`, cw[1])] }),
         new TableRow({ children: [tc("Current Full Scope", cw[0]), tc(`~${last.summary.fullScopeAfter} hrs`, cw[1], { bold: true })] }),
     ];
+    // Add timeline from latest SC if available
+    if (last.summary.timelineContext) {
+        const t2 = last.summary.timelineContext.twoDevs;
+        const t3 = last.summary.timelineContext.threeDevs;
+        rows.push(new TableRow({ children: [tc("Current MVP Timeline (2 devs)", cw[0], { shade: G100 }), tc(`~${t2.mvpMonths} months`, cw[1], { bold: true, shade: G100 })] }));
+        rows.push(new TableRow({ children: [tc("Current MVP Timeline (3 devs)", cw[0]), tc(`~${t3.mvpMonths} months`, cw[1], { bold: true })] }));
+    }
     // Add open questions row if present
     if (data.openQuestions) {
         rows.push(new TableRow({ children: [tc("Open Discovery Questions", cw[0]), tc(data.openQuestions, cw[1], { color: ORANGE })] }));

@@ -14,7 +14,7 @@ Claude instructions: `docs/claude-project-instructions.md`
 Output formats: `docs/output-formats.md`
 Quick start: `docs/quick-start.md`
 Discovery questions: `docs/discovery-questions.md`
-Scope changes: `docs/SC_XXX/scope-changes.json` → generator: `docs/gen-scope-changes.js SC_XXX` (SC-001 and SC-002 active)
+Scope changes: `docs/SC_XXX/scope-changes.json` → generator: `docs/gen-scope-changes.js SC_XXX` (SC-001, SC-002, SC-003 active)
 
 ---
 
@@ -22,11 +22,11 @@ Scope changes: `docs/SC_XXX/scope-changes.json` → generator: `docs/gen-scope-c
 
 ```
 1. Discover  → project-charter.md              ✅ COMPLETE
-1B. Discovery Q&A → discovery-questions.md      🔄 IN PROGRESS (16 answered, 23 open — awaiting client)
+1B. Discovery Q&A → discovery-questions.md      🔄 IN PROGRESS (18 answered, 21 open — awaiting client)
 2. Architect → architecture-decision-*.md       ✅ COMPLETE (Blazor confirmed)
 2B. Prototype → prototype/ folder               ✅ COMPLETE (6 screens)
 3. Estimate  → estimation-blazor.md             ✅ COMPLETE (updated with SC-002: MVP ~998 hrs)
-3B. Scope Changes → scope-changes.json          ✅ ACTIVE (SC-001: +146 hrs, SC-002: +8 hrs)
+3B. Scope Changes → scope-changes.json          ✅ ACTIVE (SC-001: +146 hrs, SC-002: +8 hrs, SC-003: 0 hrs)
 4. Execute   → weekly-status.md (per week)      ⏳ NOT STARTED
 5. Reflect   → lessons-learned.md               ⏳ NOT STARTED
 ```
@@ -64,6 +64,7 @@ Scope changes: `docs/SC_XXX/scope-changes.json` → generator: `docs/gen-scope-c
 - 2026-03-03: Azure Infrastructure PDF delivered (ReMarkets-Azure-Infrastructure-Cost-Estimate.pdf) -- 2 envs (PreProd B1 ~90/mo, Prod S1 ~157/mo), total ~247/mo (~2,964/yr), +6 hrs to estimation (MVP ~1,004, Full ~1,177).
 - 2026-03-03: Q29 added to discovery questions -- total user count never confirmed by client. ~14 was derived from counting charter stakeholders, not a client-provided number.
 - 2026-03-03: Client-facing PDF branding uses Simpat blue (#1e3a5f), NOT ReMarkets green (#488B37). ReMarkets green is for prototype UI only.
+- 2026-03-03: SC-003 created (docs/SC_003/scope-changes.json) — 2 critical client answers (A17–A18): inventory can appear in multiple active offers simultaneously (no reservation at bid stage, conflicts resolve at approval), partial allocation auto-releases remaining qty to Available (no pending hold Phase 1). Net 0 hrs — both answers confirm existing design, no new scope. MVP stays at ~998. Q14 and Q28 resolved; only Q29 remains critical.
 
 ### Pending Decisions
 
@@ -71,10 +72,10 @@ Scope changes: `docs/SC_XXX/scope-changes.json` → generator: `docs/gen-scope-c
 - Start with MudBlazor DataGrid (MIT, $0) — evaluate if in-cell editing meets requirements
 - Fallback: Telerik (~$1K/dev/yr) or AG Grid Blazor (~$1.1K/dev one-time)
 
-**2. Discovery questions awaiting client response (23 open, 3 critical)**
-- **Q14 (CRITICAL): After partial allocation, what happens to unallocated qty?** — blocks state machine for 138 hrs of work
-- **Q28 (CRITICAL): Can same inventory line appear in multiple active offers?** — blocks allocation workflow
+**2. Discovery questions awaiting client response (21 open, 1 critical)**
 - **Q29 (CRITICAL): How many total users? Will external customers access the platform?** — infrastructure sizing depends on this, could double monthly cost
+- ~~Q14 (CRITICAL): After partial allocation, what happens to unallocated qty?~~ → **RESOLVED (SC-003 A18): auto-release to Available**
+- ~~Q28 (CRITICAL): Can same inventory line appear in multiple active offers?~~ → **RESOLVED (SC-003 A17): yes, no reservation, conflicts at approval**
 - Remaining 20 open questions may impact estimation — do NOT update estimation until responses are confirmed
 - See `docs/discovery-questions.md` for full list and priority guidelines
 
@@ -105,7 +106,7 @@ Scope changes: `docs/SC_XXX/scope-changes.json` → generator: `docs/gen-scope-c
 - 3rd developer available?
 - MudBlazor DataGrid sufficient for in-cell editing? (evaluate Sprint 0)
 - Automated infrastructure setup required (Azure Bicep)?
-- **23 open discovery questions awaiting client response (3 CRITICAL: Q14, Q28, Q29)** — answers may add/reduce/change estimation items. See `docs/discovery-questions.md`
+- **21 open discovery questions awaiting client response (1 CRITICAL: Q29)** — answers may add/reduce/change estimation items. See `docs/discovery-questions.md`
 
 ---
 
@@ -152,6 +153,8 @@ All in `prototype/` folder — raw HTML, inline SVGs, CSS variables, Inter font:
 - **Client-facing PDFs:** Use Simpat blue (#1e3a5f) branding. ReMarkets green (#488B37) is for prototype UI only.
 - **Prototypes:** Raw HTML + custom CSS. Inline SVG icons ONLY — never Font Awesome or external icon CDNs. CSS variables for brand colors. Fictional/invented placeholder data (never use real client data unless Arturo provides it explicitly).
 - **Estimation:** Include ALL work — infra per environment, CI/CD, DevOps, QA, learning curve, bug buffer. Map tasks to team members.
+- **Scope change verification:** Before estimating scope change impact, ALWAYS open and read the current estimation-blazor.md first. Compare each client answer against specific existing line items by number. Only declare new hours if the answer requires work that no existing item covers. Never estimate from memory.
+- **Scope change summaries must include timeline in months** alongside hours. The boss needs to see impact in months, not just hours. Always calculate for 2-dev (80 hrs/wk) and 3-dev (120 hrs/wk) scenarios. Include timelineContext in scope-changes.json summary.
 - **Always read** `docs/methodology.md` before starting any EMPA phase.
 - **Update this file** after every major decision or phase completion.
 - **Commits:** Unique, descriptive messages — never repeat the same commit message.

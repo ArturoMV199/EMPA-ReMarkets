@@ -1,0 +1,108 @@
+{
+  "project": "ReMarkets \u2014 Bid Intelligence Platform",
+  "option": "Option B \u2014 Blazor Web App + .NET 10",
+  "baseline": {
+    "date": "2026-02-26",
+    "mvpHours": 998,
+    "postMvpHours": 117,
+    "learningHours": 56,
+    "fullScopeHours": 1171,
+    "note": "Baseline is post-SC-002 estimation. See SC_002/scope-changes.json for previous changes."
+  },
+  "changes": [
+    {
+      "id": "SC-003",
+      "date": "2026-03-03",
+      "batch": "Client Q&A \u2014 Answers A17\u2013A18 (critical questions Q28 and Q14)",
+      "items": [
+        {
+          "trigger": "A17 \u2014 Inventory in Multiple Active Offers Simultaneously (Q28)",
+          "clientAnswer": "Yes \u2014 the same inventory line can appear in multiple active offers at the same time. Bid validation still enforces qty <= current available at time of entry. Inventory is only committed at allocation approval, not at bid entry. The system should not reserve inventory at the bid stage. At allocation approval: system must display current available quantity; if allocations exceed available, system warns Admin; Admin adjusts and makes final decision.",
+          "changeType": "confirmed",
+          "description": "This confirms the system's existing design \u2014 there was never a one-offer-per-inventory-line lock. The estimation already models: (1) strict bid validation at entry checking real-time available qty (A12/SC-002, covered in #19), (2) inventory commitment only at approval (#28, 18 hrs), (3) approval workflow where Admin reviews and decides (#26, 48 hrs), (4) Admin override capability (#25, 18 hrs). The 'warn if exceeds available' behavior is standard approval validation \u2014 you cannot commit inventory without checking it exists. No new scope required.",
+          "estimationItems": [
+            "#19 MudBlazor DataGrid \u2014 in-cell editing (56 hrs) \u2014 bid validation at entry already included",
+            "#25 Admin override of winning customer (18 hrs) \u2014 Admin decision authority already included",
+            "#26 Approval workflow (48 hrs) \u2014 availability check at approval is inherent to committing inventory",
+            "#28 Automatic inventory commitment on approval (18 hrs) \u2014 commit logic must verify available qty"
+          ],
+          "hoursAdded": 0,
+          "hoursRemoved": 0,
+          "netImpact": 0,
+          "module": "Allocation & Approval Workflow",
+          "architectureNotes": [
+            "No inventory-to-offer reservation or locking mechanism needed \u2014 simplifies architecture",
+            "Bid validation checks real-time available qty (not a snapshot) \u2014 already confirmed in A12/SC-002",
+            "Allocation approval is the single control point for conflict resolution \u2014 Admin sees current state and decides",
+            "Cross-offer conflicts resolve naturally: if Offer A allocates first and commits qty, Offer B's approval step will show reduced available qty",
+            "Concurrency at approval (two Admins approving simultaneously for same inventory) is a general infrastructure concern already captured in Risk Assessment, not specific to this answer"
+          ],
+          "riskReduction": "Resolves Q28 (Phase 1 CRITICAL). Unblocks allocation workflow items #25, #26, #28 (combined 84 hrs). Simplest possible design \u2014 no reservation layer, no per-offer qty tracking."
+        },
+        {
+          "trigger": "A18 \u2014 Unallocated Quantity After Partial Allocation: Auto-Release (Q14)",
+          "clientAnswer": "Option A \u2014 Auto-release. After partial allocation: allocated quantity moves to Committed, remaining quantity returns to Available inventory. Original bid marked 'Partially Allocated.' Remaining quantity is not reserved \u2014 can be bid on again, allocated to other customers, included in future offers. No special 'pending hold' logic in Phase 1.",
+          "changeType": "confirmed",
+          "description": "Client chose the simplest of the three options we proposed (auto-release, hold pending, admin decides). This is the natural behavior of the system as already designed: when you commit 60 of 100, the 40 were never committed \u2014 they remain Available by definition. The 'Partially Allocated' bid status is a derived state within the existing split allocation scope (#34, 48 hrs) \u2014 if allocated_qty < bid_qty, the bid is partially allocated. No new entities, states, or workflows required.",
+          "estimationItems": [
+            "#34 Partial/split allocations across customers (48 hrs) \u2014 partial allocation status is a derived state within this item",
+            "#16 State transitions \u2014 automatic on approval + manual override (24 hrs) \u2014 Available/Committed transitions already modeled",
+            "#28 Automatic inventory commitment on approval (18 hrs) \u2014 commits only allocated qty, remainder stays Available"
+          ],
+          "hoursAdded": 0,
+          "hoursRemoved": 0,
+          "netImpact": 0,
+          "module": "Allocation & Approval Workflow",
+          "architectureNotes": [
+            "Auto-release is the default behavior \u2014 uncommitted qty was never moved out of Available",
+            "'Partially Allocated' is a computed status: bid.allocatedQty > 0 AND bid.allocatedQty < bid.requestedQty",
+            "No hold/reserve/pending pool state needed in Phase 1 \u2014 reduces state machine complexity",
+            "Remaining qty is immediately available for new bids and allocations across any offer"
+          ],
+          "riskReduction": "Resolves Q14 (Phase 1 CRITICAL). Unblocks state machine design for items #16, #22, #26, #34 (combined 138 hrs of work that depended on this answer). Risk Assessment item 'Partial/split allocation business rules unclear' is now significantly de-risked."
+        }
+      ],
+      "summary": {
+        "totalAdded": 0,
+        "totalRemoved": 0,
+        "netImpact": 0,
+        "mvpBefore": 998,
+        "mvpAfter": 998,
+        "postMvpBefore": 117,
+        "postMvpAfter": 117,
+        "learningBefore": 56,
+        "learningAfter": 56,
+        "fullScopeBefore": 1171,
+        "fullScopeAfter": 1171,
+        "bugBufferRecalc": false,
+        "bugBufferNote": "No hours added or removed. Bug buffer unchanged at 90 hrs.",
+        "note": "Both critical open questions (Q14 and Q28) resolved with 0 hours impact. Client chose the simplest design options in both cases \u2014 no reservation at bid stage, auto-release after partial allocation, Admin as single decision point at approval. These answers unblock ~222 hrs of combined estimation work (items #16, #22, #25, #26, #28, #34) and significantly reduce the 'Partial/split allocation business rules unclear' risk. Only Q29 (total user count / external access) remains as a critical open question. Timeline unchanged: MVP ~3.3 months (2 devs) or ~2.2 months (3 devs). Full scope ~3.7 months (2 devs) or ~2.4 months (3 devs).",
+        "criticalQuestionsResolved": [
+          "Q14 \u2014 Unallocated qty after partial allocation \u2192 Auto-release to Available (simplest option)",
+          "Q28 \u2014 Same inventory in multiple active offers \u2192 Yes, no reservation, conflicts resolved at approval"
+        ],
+        "remainingCriticalQuestions": [
+          "Q29 \u2014 Total user count / external customer access \u2014 infrastructure sizing depends on this"
+        ],
+        "timelineContext": {
+          "mvpPlusLearning": 1054,
+          "fullScope": 1171,
+          "twoDevs": {
+            "hrsPerWeek": 80,
+            "mvpWeeks": 13.2,
+            "mvpMonths": 3.3,
+            "fullWeeks": 14.6,
+            "fullMonths": 3.7
+          },
+          "threeDevs": {
+            "hrsPerWeek": 120,
+            "mvpWeeks": 8.8,
+            "mvpMonths": 2.2,
+            "fullWeeks": 9.8,
+            "fullMonths": 2.4
+          }
+        }
+      }
+    }
+  ]
+}

@@ -57,6 +57,18 @@ These questions were already asked and answered. Documented here for traceabilit
 |---|----------|--------|--------|------|
 | A16 | In-app audit viewer in Phase 1, or capture-only? | Capture immutable records + basic in-app viewing at entity level (bid history, allocation changes on a record). No full enterprise audit search console Phase 1. Advanced querying downstream in reporting. | Confirms #36 (21 hrs) entity-level viewer in MVP. #44 (15 hrs) advanced views stays Post-MVP. No hour change. | 2026-02 |
 
+### Inventory & Offer Cross-Reference
+
+| # | Question | Answer | Impact | Date |
+|---|----------|--------|--------|------|
+| A17 | Can the same inventory line appear in multiple active offers at the same time? | **Yes.** Bid validation enforces qty ≤ current available at entry. Inventory committed only at allocation approval, not at bid stage. No reservation at bid stage. At approval: system displays current available qty; if allocations exceed available, warns Admin; Admin adjusts and decides. | No hour change. Cross-offer conflicts resolve naturally at approval — existing items #25 (18 hrs), #26 (48 hrs), #28 (18 hrs) already cover this workflow. No reservation layer needed. | 2026-03 |
+
+### Allocation — Partial Allocation Handling
+
+| # | Question | Answer | Impact | Date |
+|---|----------|--------|--------|------|
+| A18 | After partial/split allocation, what happens to remaining inventory? | **Auto-release.** Allocated qty → Committed, remaining qty → Available immediately. Bid marked "Partially Allocated." Remaining qty not reserved — can be bid on, allocated to others, included in future offers. No pending hold logic Phase 1. | No hour change. Auto-release is the natural system behavior — uncommitted qty was never moved out of Available. "Partially Allocated" is a derived state within existing #34 (48 hrs). | 2026-03 |
+
 ### Authentication
 
 | # | Question | Answer | Impact | Date |
@@ -97,20 +109,12 @@ These questions were already asked and answered. Documented here for traceabilit
 |---|----------|---------------|-----------------|
 | Q2 | Do you want offer templates to reuse previous offer structures? | Weekly auctions with similar inventory = repetitive setup. Templates could save sales reps significant time. | +12-20 hrs if yes, but high ROI for users |
 
-### 🔴 Bid Validation & Oversubscription
-
 ### 🔴 Timezone & Concurrency
 
 | # | Question | Why it matters | Potential impact |
 |---|----------|---------------|-----------------|
 | Q4 | What timezone for auction start/end times? Display in user's local time or company time? | Bid deadlines to the minute require clear timezone handling. Wrong timezone = wrong deadline. | +4-8 hrs for timezone-aware datetime handling |
 | Q5 | Can two reps edit bids on the same offer simultaneously? If so, how handle conflicts? | Blazor Interactive Server uses SignalR — real-time capable but need conflict resolution strategy. | +8-16 hrs if optimistic concurrency + conflict UI needed |
-
-### 🔴 Inventory & Offer Cross-Reference (NEW — identified during SC-002 analysis)
-
-| # | Question | Why it matters | Potential impact |
-|---|----------|---------------|-----------------|
-| Q28 | Can the same inventory line appear in multiple active offers at the same time? | The client confirmed bid qty must not exceed current available at time of entry. This works when inventory lives in one offer at a time. But if the same line is in Offer A and Offer B simultaneously, both offers accept bids against the same available qty. When Offer A allocates and commits, Offer B's valid bids may exceed what remains. This isn't oversubscription (each bid was valid when entered) but creates the same conflict at allocation time. We need to know: allow it (warn admin at allocation), prevent it (lock inventory to one offer), or track reserved-per-offer qty. Directly affects allocation workflow (#26, 48 hrs) and inventory commitment (#28, 18 hrs). | **Phase 1 critical** — must resolve before Sprint 1. Could add +8-16 hrs if reservation-per-offer tracking needed. |
 
 ### 🔴 Inventory Gaps
 
@@ -134,7 +138,6 @@ These questions were already asked and answered. Documented here for traceabilit
 
 | # | Question | Why it matters | Potential impact |
 |---|----------|---------------|-----------------|
-| Q14 | After partial/split allocation, what happens to remaining inventory? Back to Available? Stays in pending pool? Admin decides? | Affects inventory state machine, bid status lifecycle, and whether remaining qty can be re-offered. Connected to A12 confirmation of partial allocation. Three options identified (auto-release, hold pending, admin decides) — each changes state transitions in #16, #22, #26, #34. | **Phase 1 critical** — 138 hrs of combined work depends on this answer. Must resolve before Sprint 1. |
 | Q17 | One export per customer order, or consolidated exports across customers? | Affects export generation logic and UI. | +4-8 hrs if multiple export formats needed |
 
 ### 🔴 Dashboard & Reporting
@@ -173,8 +176,6 @@ These questions were already asked and answered. Documented here for traceabilit
 ### Priority Guidelines
 
 Ask these first — they have the highest estimation impact:
-- **Q14 (Unallocated qty after partial allocation) — Phase 1 CRITICAL, blocks state machine for 138 hrs of work**
-- **Q28 (Same inventory in multiple active offers) — Phase 1 CRITICAL, blocks allocation workflow**
 - **Q29 (Total user count / external access) — infrastructure sizing depends on this, could double monthly cost**
 - Q10 (Multi-currency) — could add 40-60 hrs
 - Q5 (Concurrent editing) — architecture impact
@@ -184,6 +185,8 @@ Ask these first — they have the highest estimation impact:
 - Q2 (Offer templates) — high ROI for users
 
 Previously high priority, now answered:
+- ~~Q14 (Unallocated qty after partial allocation)~~ → Answered as A18 (auto-release, 0 hrs impact)
+- ~~Q28 (Same inventory in multiple active offers)~~ → Answered as A17 (yes, no reservation, 0 hrs impact)
 - ~~Q1 (Offer lifecycle states)~~ → Answered as A11
 - ~~Q3 (Oversubscription vs strict validation)~~ → Answered as A12
 - ~~Q15 (Split allocation representation)~~ → Answered as A13
