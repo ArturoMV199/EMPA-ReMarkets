@@ -1,103 +1,118 @@
-# EMPA - Estimation Methodology Plus Assessments
+# EMPA-ReMarkets — Bid Intelligence Platform
 
-An AI-assisted project framework for small consulting and analysis teams (2-5 people). EMPA uses **Claude as an active team member** to drive discovery, architecture decisions, visual prototyping, estimation, tracking, and documentation through conversation.
-
-You bring the context. Claude asks the questions, recommends the tech stack, builds a clickable prototype, estimates the work, and tracks the project.
+Estimation, architecture, prototyping, and project tracking for the ReMarkets Bid Intelligence Platform, built using the [EMPA framework](https://github.com/ArturoMV199/EMPA).
 
 ---
 
-## How It Works
+## Project Summary
 
-```
-YOU: "We have a new project, here's what we know..." [upload docs]
-         |
-         v
-CLAUDE: Asks questions --> Understands business problem --> Generates charter
-         |
-         v
-CLAUDE: Analyzes needs --> Proposes architecture options --> Team decides
-         |
-         v
-CLAUDE: Builds clickable HTML prototype --> Team reviews --> Client sees it
-         |
-         v
-CLAUDE: Breaks down ALL tasks --> Maps to team --> Estimates hours --> Defines MVP
-         |
-         v
-TEAM:   Executes --> Reports progress weekly --> Claude tracks and flags drift
-         |
-         v
-CLAUDE: Analyzes results --> Evaluates decisions --> Improves future estimates
-```
+Internal web application for REMarkets to replace spreadsheet/email-based bidding workflows for server components (RAM, CPUs, NVMe, NICs). Covers bid management, inventory handling, allocation approvals, role-based access, act-on-behalf, audit trails, and order-ready exports.
+
+**Client:** REMarkets
+**Consulting Firm:** Simpat Tech
+**First project built with EMPA.**
 
 ---
 
-## Methodology
+## Current Status
 
-| Phase | Who Drives | What Happens | Output |
-|-------|-----------|-------------|--------|
-| **1. Discover** | Claude asks, you answer | Business problem, scope, stakeholders | `project-charter.md` |
-| **2. Architect** | Claude analyzes, team decides | Stack, environments, CI/CD, team roles, cost | `architecture-decision.md` |
-| **2B. Prototype** | Claude builds, team reviews | Clickable HTML screens with professional look | `prototype/` folder |
-| **3. Estimate** | Claude proposes, team validates | All tasks mapped to people with hours and MVP | `estimation.md` |
-| **4. Execute** | Team works, Claude tracks | Weekly cycles with drift alerts | `weekly-status.md` |
-| **5. Reflect** | Claude analyzes, team learns | Metrics, tech assessment, improved factors | `lessons-learned.md` |
+| Phase | Status | Output |
+|-------|--------|--------|
+| 1. Discover | Complete | `project-charter.md` — 14 stakeholders, 10 risks |
+| 1B. Discovery Q&A | In Progress | `docs/discovery-questions.md` — 18 answered, 21 open (1 critical) |
+| 2. Architect | Complete | `docs/architecture-decision-blazor.md` — Blazor + .NET 10 confirmed |
+| 2B. Prototype | Complete | `prototype/` — 6 screens (Login, Dashboard, Offers, Inventory, Allocations, Customers) |
+| 3. Estimate | Complete | `docs/estimation-blazor.md` — MVP ~998 hrs, Full ~1,171 hrs |
+| 3B. Scope Changes | Active | 3 batches (SC-001: +146 hrs, SC-002: +8 hrs, SC-003: 0 hrs) |
+| 4. Execute | Not Started | — |
+| 5. Reflect | Not Started | — |
 
-Full details: [docs/methodology.md](docs/methodology.md)
+---
+
+## Architecture (Confirmed)
+
+| Component | Choice |
+|-----------|--------|
+| Frontend + Backend | Blazor Web App (.NET 10) — unified C# codebase |
+| Render Modes | Static SSR + Interactive Server (SignalR) |
+| UI Components | MudBlazor DataGrid (MIT, free) |
+| Database | Azure SQL Database + EF Core 10 (Code-First) |
+| Auth | Microsoft Entra ID + Azure AD Groups (5 roles) |
+| Hosting | Azure App Service (Dev, Test, Prod — existing) |
+| CI/CD | Single project, single deploy |
+| Exports | CSV (MVP), PDF via QuestPDF (Post-MVP) |
+
+---
+
+## Estimation Summary
+
+| Concept | Hours |
+|---------|-------|
+| MVP (Must Have) | ~998 hrs |
+| Post-MVP (Should Have) | ~117 hrs |
+| Learning Curve | ~56 hrs |
+| **Full Scope** | **~1,171 hrs** |
+
+### Timeline
+
+| Scenario | 2 Developers | 3 Developers |
+|----------|-------------|-------------|
+| MVP + Learning | ~3.3 months | ~2.2 months |
+| Full Scope | ~3.7 months | ~2.4 months |
+
+---
+
+## Scope Change History
+
+| Batch | Date | Trigger | Net Impact | MVP After |
+|-------|------|---------|------------|-----------|
+| SC-001 | 2026-02-23 | Client Q&A A1–A10 | +146 hrs | ~990 hrs |
+| SC-002 | 2026-02-26 | Client Q&A A11–A16 | +8 hrs | ~998 hrs |
+| SC-003 | 2026-03-03 | Client Q&A A17–A18 (critical) | 0 hrs | ~998 hrs |
+
+All scope changes include client answer quotes as evidence. Generated as Word/PDF via `docs/gen-scope-changes.js`.
 
 ---
 
 ## Project Structure
 
 ```
-EMPA/
+EMPA-ReMarkets/
+├── project-charter.md                    # Phase 1: Discovery output
 ├── docs/
-│   ├── methodology.md                   # EMPA methodology (5 phases + prototype)
-│   ├── claude-project-instructions.md   # Instructions for Claude.ai Projects
-│   ├── output-formats.md               # Document formats Claude generates
-│   └── quick-start.md                  # How to start a new project
-├── prototype/                           # Clickable HTML prototype (per project)
-├── index.html                           # Project dashboard
-├── css/styles.css                       # Base styles
-├── js/main.js                           # Main logic
-├── img/                                 # Visual assets
-├── assets/                              # Additional resources
-├── fonts/                               # Custom fonts
-├── .gitignore
+│   ├── architecture-decision-blazor.md   # Phase 2: Architecture (confirmed)
+│   ├── estimation-blazor.md              # Phase 3: Full estimation
+│   ├── discovery-questions.md            # Living Q&A backlog
+│   ├── gen-scope-changes.js              # Scope change Word/PDF generator
+│   ├── gen-estimation.js                 # Estimation Word/PDF generator
+│   ├── SC_001/scope-changes.json         # Scope change batch 1
+│   ├── SC_002/scope-changes.json         # Scope change batch 2
+│   ├── SC_003/scope-changes.json         # Scope change batch 3
+│   └── AllFilesDocs_Estimations/         # Generated PDFs and cost estimates
+├── prototype/                             # Phase 2B: 6 clickable HTML screens
+│   ├── index.html                        # Login (Microsoft Entra SSO)
+│   ├── dashboard.html                    # Dashboard with KPI cards
+│   ├── offers.html                       # Offer management + bid line items
+│   ├── inventory.html                    # Inventory list + bulk upload
+│   ├── allocations.html                  # Allocation + approval workflow
+│   └── customers.html                    # Customer management
+├── prototype_v2/                          # Prototype iteration 2
+├── CLAUDE.md                              # Project state + rules for Claude Code
 └── README.md
 ```
 
 ---
 
-## Quick Start
+## Key Decisions
 
-1. **Use this template** → Click "Use this template" → name it `EMPA-ProjectName`
-2. **Create a Claude.ai Project** → paste instructions from `docs/claude-project-instructions.md`
-3. **Upload your project context** (emails, briefs, SOWs, technical docs)
-4. **Start:** "Claude, we have a new EMPA project. Here's what we know: [context]"
-
-Full guide: [docs/quick-start.md](docs/quick-start.md)
-
----
-
-## What Makes EMPA Different
-
-- **Claude is a team member, not a tool.** Claude drives discovery, challenges assumptions, flags risks, and generates all documentation from conversation.
-- **Architecture before estimation.** You can't estimate accurately without knowing the stack, environments, CI/CD, and team roles first.
-- **Visual prototypes sell projects.** Claude builds clickable HTML prototypes with inline SVGs, CSS variables, and realistic data — no wireframes, no mockups.
-- **Estimation includes everything.** Not just code — infra per environment, CI/CD pipelines, DevOps, QA, learning curve, bug buffer, all mapped to team members.
-- **Continuous improvement.** Every project ends with a retrospective that updates estimation factors for the next one.
-
----
-
-## Projects Built with EMPA
-
-| Project | Repository | Stack | Status | Accuracy |
-|---------|------------|-------|--------|----------|
-| -       | -          | -     | -      | -        |
+- **Blazor over React:** Saves ~155 hrs (12%) and ~2 weeks. Single codebase, single deploy. Trade-off: smaller community, harder hiring long-term.
+- **Azure AD Groups over Internal DB Roles:** Saves ~24 hrs. No user/role tables in app DB. Roles managed in Azure AD.
+- **MudBlazor (free) over paid grids:** Evaluate in Sprint 0. Fallback: Telerik (~$1K/dev/yr) or AG Grid (~$1.1K/dev).
+- **Act-on-Behalf from day 1:** Phase 1 is internal-only — all bids entered by sales reps on behalf of customers.
+- **Flat allocation records:** Multiple records per customer per inventory line (not nested). Cleaner audit, export, and reversal.
 
 ---
 
 ## License
 
-This project is for personal use.
+This project is for internal use. All code and artifacts are REMarkets intellectual property.
