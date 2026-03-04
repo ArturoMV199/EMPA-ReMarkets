@@ -1,0 +1,196 @@
+---
+title: "ReMarkets — Workflow por Módulo"
+---
+graph TD
+
+    %% ============================================
+    %% INVENTORY MANAGEMENT
+    %% Sources: #11, #12, #12b, #13, #14, #15, #16
+    %% Answers: A2, A3, A4, A15, A17, A18
+    %% ============================================
+    subgraph INV["Inventory Management"]
+        direction TB
+        INV1["CSV/Excel Upload<br/>#11"]
+        INV2{"Parse & Validate<br/>each row = distinct<br/>adjustment record (A4)"}
+        INV3{"Identity Check<br/>PartNumber + condition<br/>+ location + grade (A3)"}
+        INV4["Net-new part:<br/>populate master description"]
+        INV5["Existing part:<br/>retain source description only<br/>master requires Admin/SM action"]
+        INV6[("Inventory Record<br/>Status: Available")]
+        INV7["Master Description Edit UI<br/>Admin/Sales Manager only<br/>audited, no approval step (A15)<br/>#12b"]
+        INV8["Group Inventory<br/>into Offers<br/>#15"]
+
+        INV1 --> INV2
+        INV2 -->|"valid rows"| INV3
+        INV2 -->|"invalid rows"| INV2R["Reject with errors"]
+        INV3 -->|"net-new"| INV4
+        INV3 -->|"existing"| INV5
+        INV4 --> INV6
+        INV5 --> INV6
+        INV6 --> INV8
+        INV7 -.->|"edits master<br/>description"| INV6
+    end
+
+    %% ============================================
+    %% OFFER LIFECYCLE
+    %% Sources: #17, #18
+    %% Answer: A11 — six states confirmed
+    %% ============================================
+    subgraph OFR["Offer Lifecycle (A11)"]
+        direction LR
+        OFR1["Draft"]
+        OFR2["Active<br/>bids accepted"]
+        OFR3["Closed<br/>deadline passed"]
+        OFR4["Allocating<br/>admin reviews bids"]
+        OFR5["Finalized<br/>all allocations approved"]
+        OFR6["Cancelled"]
+
+        OFR1 -->|"activate"| OFR2
+        OFR2 -->|"deadline"| OFR3
+        OFR3 -->|"begin allocation"| OFR4
+        OFR4 -->|"all approved"| OFR5
+        OFR1 -->|"cancel"| OFR6
+        OFR2 -->|"cancel"| OFR6
+    end
+
+    %% ============================================
+    %% BID ENTRY
+    %% Sources: #19, #20, #21, #22, #23, #32, #33
+    %% Answers: A5, A6, A12, A17
+    %% ============================================
+    subgraph BID["Bid Entry"]
+        direction TB
+        BID1["Sales Rep selects<br/>customer context<br/>Act-on-Behalf #32, #33"]
+        BID2["Enter bid in DataGrid<br/>qty, price, bid type<br/>bid / BIN / target pricing<br/>#19, #21"]
+        BID3{"System Validates (A6)<br/>qty <= available (A12)<br/>qty > 0, price > 0<br/>offer must be active"}
+        BID4{"One active bid per<br/>customer per line<br/>per offer? (A5)"}
+        BID5["Create new bid"]
+        BID6["Create new revision<br/>previous retained for audit"]
+        BID7[("Bid Recorded<br/>with full attribution:<br/>who acted + for whom")]
+
+        BID1 --> BID2
+        BID2 --> BID3
+        BID3 -->|"fail"| BID3R["Validation error<br/>shown in grid"]
+        BID3 -->|"pass"| BID4
+        BID4 -->|"no existing bid"| BID5
+        BID4 -->|"existing bid"| BID6
+        BID5 --> BID7
+        BID6 --> BID7
+    end
+
+    %% ============================================
+    %% ALLOCATION & APPROVAL
+    %% Sources: #24, #25, #26, #27, #28, #31, #34
+    %% Answers: A7, A9, A10, A12, A13, A17, A18
+    %% ============================================
+    subgraph ALC["Allocation & Approval"]
+        direction TB
+        ALC1["Aggregated view:<br/>all bids per offer<br/>#24"]
+        ALC2{"Ties detected? (A7)"}
+        ALC3["Admin/Manager manually<br/>selects winner #31"]
+        ALC4{"Below floor<br/>price? (A9)"}
+        ALC5["Visual warning shown<br/>no auto-reject #27"]
+        ALC6["Sales Manager / Admin<br/>reviews allocation<br/>all manager-approved Phase 1 (A9)<br/>Admin: full authority (A10)"]
+        ALC7{"Decision"}
+        ALC8["Approved"]
+        ALC9["Rejected"]
+        ALC10["Admin overrides<br/>winning customer #25"]
+        ALC11{"Partial allocation?<br/>(A18)"}
+        ALC12["Full qty committed"]
+        ALC13["Allocated qty: Committed<br/>Remaining qty: Available<br/>Bid: Partially Allocated<br/>#34, flat records (A13)"]
+        ALC14[("Inventory committed<br/>Available to Committed<br/>#28")]
+
+        ALC1 --> ALC2
+        ALC2 -->|"yes"| ALC3
+        ALC2 -->|"no"| ALC4
+        ALC3 --> ALC4
+        ALC4 -->|"yes"| ALC5
+        ALC4 -->|"no"| ALC6
+        ALC5 --> ALC6
+        ALC6 --> ALC7
+        ALC6 -.->|"override"| ALC10
+        ALC10 --> ALC7
+        ALC7 -->|"approve"| ALC8
+        ALC7 -->|"reject"| ALC9
+        ALC8 --> ALC11
+        ALC11 -->|"full qty"| ALC12
+        ALC11 -->|"partial"| ALC13
+        ALC12 --> ALC14
+        ALC13 --> ALC14
+    end
+
+    %% ============================================
+    %% REVERSAL
+    %% Sources: #29, #30
+    %% Answer: A8
+    %% ============================================
+    subgraph REV["Allocation Reversal (A8)"]
+        direction TB
+        REV1["Admin triggers reversal<br/>on approved allocation"]
+        REV2["Reason code required<br/>#30"]
+        REV3["Inventory: Committed<br/>back to Available #29"]
+        REV4["Allocation marked<br/>as Reversed"]
+        REV5["Export locked /<br/>regenerated"]
+        REV6[("Full audit trail<br/>recorded")]
+
+        REV1 --> REV2
+        REV2 --> REV3
+        REV3 --> REV4
+        REV4 --> REV5
+        REV5 --> REV6
+    end
+
+    %% ============================================
+    %% EXPORT
+    %% Sources: #37
+    %% Answer: A14
+    %% ============================================
+    subgraph EXP["Order-Ready Export (A14)"]
+        direction TB
+        EXP1["Approved allocations<br/>ready for export"]
+        EXP2["Generate CSV<br/>1 row per allocation<br/>record (flat, A13)<br/>#37"]
+        EXP3["Columns: PartNumber,<br/>Description, Customer,<br/>AllocatedQty, ApprovedPrice,<br/>ExtendedValue, Timestamp,<br/>OfferID, AllocationID"]
+
+        EXP1 --> EXP2
+        EXP2 --> EXP3
+    end
+
+    %% ============================================
+    %% AUDIT (cross-cutting)
+    %% Sources: #35, #36
+    %% Answer: A16
+    %% ============================================
+    subgraph AUD["Audit & Compliance (A16)"]
+        direction LR
+        AUD1["EF Core interceptor<br/>captures all changes<br/>immutable records #35"]
+        AUD2["In-app viewer<br/>per entity: bid history,<br/>allocation changes #36"]
+    end
+
+    %% ============================================
+    %% CONNECTIONS BETWEEN MODULES
+    %% ============================================
+    INV8 -->|"inventory grouped<br/>into offer"| OFR1
+    OFR2 -->|"offer active:<br/>bids accepted"| BID1
+    OFR4 -->|"allocating"| ALC1
+    ALC14 -->|"committed"| EXP1
+    ALC8 -.->|"if reversal needed"| REV1
+    REV3 -.->|"qty returns to<br/>Available"| INV6
+
+    %% ============================================
+    %% INVENTORY STATE MACHINE (cross-reference)
+    %% Sources: #14, #16, #28, #29
+    %% Answers: A17, A18
+    %% ============================================
+    subgraph ISM["Inventory States (#14, #16)"]
+        direction LR
+        ISM1(["Available"])
+        ISM2(["Committed"])
+        ISM3(["Released"])
+
+        ISM1 -->|"allocation approved<br/>#28"| ISM2
+        ISM2 -->|"export completed"| ISM3
+        ISM2 -->|"reversal (A8)<br/>#29"| ISM1
+    end
+
+    %% Note: Same inventory can appear in multiple active offers (A17)
+    %% No reservation at bid stage — commitment only at approval
+    %% Conflicts resolved by Admin at approval time

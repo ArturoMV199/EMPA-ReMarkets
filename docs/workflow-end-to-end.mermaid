@@ -1,0 +1,167 @@
+---
+title: "ReMarkets — End-to-End por Rol"
+---
+sequenceDiagram
+    autonumber
+
+    %% Roles from charter: Sales Rep, Sales Manager, Admin, Finance (read-only), Executive (read-only)
+    %% Auth: Microsoft Entra with Azure AD Groups (A1) — 5 groups confirmed (#5)
+
+    participant ADM as Admin
+    participant SM as Sales Manager
+    participant SR as Sales Rep
+    participant SYS as System
+    participant FIN as Finance<br/>(read-only)
+
+    %% ============================================
+    %% INVENTORY UPLOAD — #11, #12, #13
+    %% Sources: A2 (schema), A3 (composite identity), A4 (no dedupe)
+    %% ============================================
+    rect rgb(230, 245, 230)
+        Note over ADM,SYS: Inventory Management (#11-#16)
+        ADM->>SYS: Upload inventory CSV
+        SYS->>SYS: Parse & validate each row
+        SYS->>SYS: Identity check: PartNumber +<br/>condition + location + grade (A3)
+
+        alt Net-new part
+            SYS->>SYS: Populate master description
+        else Existing part
+            SYS->>SYS: Retain source description only (A3)<br/>master changes require Admin/SM
+        end
+
+        SYS->>SYS: Create distinct adjustment record<br/>per row — never merge (A4)
+        SYS-->>ADM: Upload result: valid/rejected rows
+        Note over SYS: Each record: batch ID, user,<br/>timestamp, qty, source file (#13)
+        Note over SYS: Inventory status: Available (#14)
+    end
+
+    %% ============================================
+    %% OFFER CREATION — #17, #15
+    %% Source: A11 (6 states confirmed)
+    %% ============================================
+    rect rgb(230, 235, 250)
+        Note over ADM,SYS: Offer Lifecycle (#17, #18, #15)
+        ADM->>SYS: Create new offer
+        Note over SYS: Offer status: Draft (A11)
+        ADM->>SYS: Group inventory lines into offer (#15)
+        Note over SYS: Same inventory CAN appear<br/>in multiple active offers (A17)
+        ADM->>SYS: Activate offer
+        Note over SYS: Offer status: Draft → Active (A11)
+        SYS-->>SR: Offer visible — bids accepted
+    end
+
+    %% ============================================
+    %% BID ENTRY — #19, #20, #21, #32, #33
+    %% Sources: A5 (one bid per customer/line/offer), A6 (validation), A12 (qty <= available)
+    %% ============================================
+    rect rgb(255, 245, 230)
+        Note over SR,SYS: Bid Entry (#19-#23, #32-#33)
+        SR->>SYS: Select customer context<br/>(act-on-behalf #32, #33)
+        Note over SYS: Visual indicator: acting for [Customer]
+        SR->>SYS: Enter bids in DataGrid (#19)<br/>qty, price, bid type<br/>(bid / BIN / target pricing #21)
+        SYS->>SYS: Validate: qty <= current available (A12),<br/>qty > 0, price > 0, offer active (A6)
+
+        alt Validation fails
+            SYS-->>SR: Error shown in grid
+        else Validation passes
+            alt No existing bid for this customer/line/offer
+                SYS->>SYS: Create new bid
+            else Existing bid (A5)
+                SYS->>SYS: Create new revision<br/>previous retained for audit
+                Note over SYS: Only latest revision active (A5)
+            end
+            SYS->>SYS: Record full attribution:<br/>who acted + for whom (#32)
+            SYS-->>SR: Bid confirmed
+        end
+    end
+
+    %% ============================================
+    %% OFFER CLOSES
+    %% Source: A11
+    %% ============================================
+    rect rgb(240, 240, 240)
+        Note over SYS: Offer deadline passes
+        SYS->>SYS: Offer status: Active → Closed (A11)
+        SYS->>SYS: Offer status: Closed → Allocating (A11)
+        SYS-->>SM: Offer ready for allocation review
+        SYS-->>ADM: Offer ready for allocation review
+    end
+
+    %% ============================================
+    %% ALLOCATION & APPROVAL — #24-#28, #31, #34
+    %% Sources: A7 (ties), A9 (all manager-approved), A10 (admin full authority)
+    %% A13 (flat records), A17 (cross-offer), A18 (auto-release)
+    %% ============================================
+    rect rgb(255, 235, 235)
+        Note over SM,SYS: Allocation & Approval (#24-#28, #31, #34)
+        SM->>SYS: Open aggregated allocation view (#24)
+        SYS-->>SM: All bids per offer displayed
+
+        opt Ties detected (A7)
+            SYS-->>SM: System surfaces tied bids (#31)
+            SM->>SYS: Manually select winner
+        end
+
+        opt Below floor price (A9)
+            SYS-->>SM: Visual warning shown (#27)<br/>no auto-reject Phase 1
+        end
+
+        alt Full allocation
+            SM->>SYS: Approve allocation<br/>all manager-approved Phase 1 (A9)
+            SYS->>SYS: Inventory: Available → Committed (#28)
+        else Partial / split allocation (A18)
+            SM->>SYS: Allocate partial qty to customer(s)<br/>flat records per customer (A13) #34
+            SYS->>SYS: Allocated qty → Committed
+            SYS->>SYS: Remaining qty → Available<br/>immediately (auto-release A18)
+            Note over SYS: Bid marked: Partially Allocated
+        else Reject
+            SM->>SYS: Reject allocation
+            Note over SYS: Bid status: Rejected
+        end
+
+        opt Admin override needed (A10)
+            ADM->>SYS: Override winning customer (#25)<br/>Admin: full authority including override
+        end
+
+        Note over SYS: All allocations processed
+        SYS->>SYS: Offer status: Allocating → Finalized (A11)
+    end
+
+    %% ============================================
+    %% EXPORT — #37
+    %% Source: A14 (CSV format, 9 columns)
+    %% ============================================
+    rect rgb(230, 250, 230)
+        Note over SM,FIN: Order-Ready Export (#37)
+        SM->>SYS: Generate CSV export
+        SYS->>SYS: 1 row per allocation record (A13)
+        Note over SYS: Columns: PartNumber, Description,<br/>Customer, AllocatedQty, ApprovedPrice,<br/>ExtendedValue, Timestamp,<br/>OfferID, AllocationID (A14)
+        SYS-->>SM: CSV file ready
+    end
+
+    %% ============================================
+    %% AUDIT REVIEW — #35, #36
+    %% Source: A16 (capture + entity-level viewing)
+    %% ============================================
+    rect rgb(245, 240, 255)
+        Note over FIN,SYS: Audit & Compliance (#35, #36)
+        FIN->>SYS: View audit trail per entity (#36)
+        SYS-->>FIN: Bid history, allocation changes,<br/>reversal records, act-on-behalf attribution
+        Note over SYS: Immutable records captured<br/>by EF Core interceptor (#35, A16)
+    end
+
+    %% ============================================
+    %% REVERSAL (if needed) — #29, #30
+    %% Source: A8
+    %% ============================================
+    rect rgb(255, 230, 230)
+        Note over ADM,SYS: Allocation Reversal — if needed (#29, #30, A8)
+        ADM->>SYS: Trigger reversal on<br/>approved allocation
+        ADM->>SYS: Provide reason code (required #30)
+        SYS->>SYS: Inventory: Committed → Available (#29)
+        SYS->>SYS: Allocation marked: Reversed
+        SYS->>SYS: Export locked / regenerated
+        SYS->>SYS: Full audit trail recorded
+        SYS-->>ADM: Reversal complete
+        Note over SYS: Reversed is an allocation-level<br/>event, NOT an offer status (A11)
+    end
